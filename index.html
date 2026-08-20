@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="lo">
 <head>
 <meta charset="UTF-8">
@@ -459,10 +459,10 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
       <div class="sec-lbl-sub">🪪 ບັດປະຈຳໂຕ & ສຳມະໂນຄົວ</div>
       <div class="grid g3">
         <div class="field"><label>ບັດປະຈຳໂຕເລກທີ <span class="ref">(B10)</span></label><input type="text" id="c_id" value="15-08-104562" class="mono"></div>
-        <div class="field"><label>ອອກວັນທີ <span class="ref">(D10)</span></label><input type="date" id="c_id_date" value="2025-12-13"></div>
+        <div class="field"><label>ອອກວັນທີ <span class="ref">(D10)</span></label><input type="date" id="c_id_date" value="2025-12-13" min="1900-01-01" max="2099-12-31"></div>
         <div class="field"><label>ອອກໃຫ້ໂດຍ <span class="ref">(F10)</span></label><input type="text" id="c_id_by" value="ປກສ ເມືອງ ປາກຊ່ອງ"></div>
         <div class="field"><label>ສຳມະໂນຄົວເລກທີ <span class="ref">(B11)</span></label><input type="text" id="c_reg" value="215" class="mono"></div>
-        <div class="field"><label>ລົງວັນທີ <span class="ref">(D11)</span></label><input type="date" id="c_reg_date" value="2022-12-14"></div>
+        <div class="field"><label>ລົງວັນທີ <span class="ref">(D11)</span></label><input type="date" id="c_reg_date" value="2022-12-14" min="1900-01-01" max="2099-12-31"></div>
         <div class="field"><label>ອອກໃຫ້ໂດຍ <span class="ref">(F11)</span></label><input type="text" id="c_reg_by" value="ປກສ ເມືອງ ປາກຊ່ອງ"></div>
       </div>
 
@@ -3660,11 +3660,16 @@ function fmtLaoDate(v) {
 // dd/mm/yyyy — ສຳລັບຕາຕະລາງທີ່ຕ້ອງການຮູບແບບສັ້ນ (ເຊັ່ນ CIB)
 function fmtDMY(v) {
   if (!v) return '—';
-  const p = String(v).split(/[-\/]/);
+  const p = String(v).trim().split(/[-\/]/);
   if (p.length < 3) return v;
-  const day = parseInt(p[2],10), mon = parseInt(p[1],10), yr = parseInt(p[0],10);
-  if (!day||!mon||!yr) return v;
-  return day + '/' + String(mon).padStart(2,'0') + '/' + yr;
+  let day, mon, yr;
+  if (/^\d{4}$/.test(p[0])) {
+    yr = parseInt(p[0], 10); mon = parseInt(p[1], 10); day = parseInt(p[2], 10);
+  } else if (/^\d{4}$/.test(p[2])) {
+    day = parseInt(p[0], 10); mon = parseInt(p[1], 10); yr = parseInt(p[2], 10);
+  } else return v;
+  if (!day || !mon || !yr) return v;
+  return day + '/' + String(mon).padStart(2, '0') + '/' + yr;
 }
 function escapeHtml(str) {
   return String(str||'')
@@ -7781,7 +7786,15 @@ function applyResearchFilter(box) {
 function collectAllData() {
   const g = id => document.getElementById(id)?.value || '';
   const gn = id => parseNum(g(id));
-  const gd = id => { const v = g(id); return v ? new Date(v).toLocaleDateString('en-GB') : ''; }; // dd/mm/yyyy
+  const gd = id => {
+    const v = g(id).trim();
+    if (!v) return '';
+    const m = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return v;
+    const yr = parseInt(m[1], 10), mon = parseInt(m[2], 10), day = parseInt(m[3], 10);
+    if (yr < 1900 || yr > 2100 || mon < 1 || mon > 12 || day < 1 || day > 31) return v;
+    return day + '/' + m[2] + '/' + yr;
+  };
 
   if (typeof syncLegacyWithdrawFieldsFromTable === 'function') syncLegacyWithdrawFieldsFromTable();
 
@@ -18371,6 +18384,8 @@ function saveFormJSON() {
   if (ratingEl && ratingEl.style.display !== 'none' && ratingEl.textContent.trim()) {
     data.swot_overall_rating = ratingEl.textContent.replace(/^🏦\s*/, '').trim();
   }
+  const colTextEl = document.getElementById('col_display_text');
+  if (colTextEl) data['__col_text_manual'] = colTextEl.dataset.manual === '1';
 
   const company = (document.getElementById('f_company')||{}).value || 'APB';
   const date = new Date().toISOString().slice(0,10);
@@ -18422,6 +18437,16 @@ function loadFormJSON(event) {
       if (data.col_display_mode) {
         const cr = document.querySelector(`input[name="col_display_mode"][value="${data.col_display_mode}"]`);
         if (cr) cr.checked = true;
+      }
+      const colTextEl = document.getElementById('col_display_text');
+      if (colTextEl) {
+        const savedText = String(data.col_display_text || '').trim();
+        const manualFlag = data['__col_text_manual'];
+        if (savedText && (manualFlag === true || manualFlag === 'true' || manualFlag === undefined)) {
+          colTextEl.dataset.manual = '1';
+        } else if (manualFlag === false || manualFlag === 'false') {
+          delete colTextEl.dataset.manual;
+        }
       }
       if (typeof onColDisplayModeChanged === 'function') onColDisplayModeChanged();
       ['res_cib_display', 'res_dep_display', 'res_usage_display'].forEach(name => {
