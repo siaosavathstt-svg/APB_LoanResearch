@@ -12352,10 +12352,10 @@ function calcFooterFontSize(totalLength) {
   return '7.5pt';
 }
 
-/** Per-page footer: ແຖວຂໍ້ມູນ + ໜ້າ X/Y ຢູ່ເທິງຮູບ APB (ຕິດກັນບໍ່ຫ່າງ). */
+/** Per-page footer: ແຖວຂໍ້ມູນ + ໜ້າ X/Y; ຮູບ APB ສະເພາະໜ້າທຳອິດ. */
 function buildPageFooterHtml(pageNum, total, footerLineHTML, dynamicFontSize) {
   const pageStr = `ໜ້າ ${pageNum} / ${total}`;
-  const imgHtml = (typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG)
+  const imgHtml = (pageNum === 1 && typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG)
     ? `<div class="apb-footer-wrap"><img src="${APB_FOOTER_IMG}" alt="APB Footer"></div>`
     : '';
   const metaRow =
@@ -13333,12 +13333,14 @@ function paginatePreview() {
     previewEl.innerHTML = '';
     previewEl.classList.add('paginated-mode');
 
+    let pageCreateIdx = 0;
     const makePage = () => {
       const p = document.createElement('div');
       p.className = 'preview-a4-page';
-      if (typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG) {
+      if (pageCreateIdx === 0 && typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG) {
         p.classList.add('has-apb-footer-img');
       }
+      pageCreateIdx++;
       return p;
     };
 
@@ -13738,18 +13740,13 @@ function paginatePreview() {
     if (!skipPdfFooter) {
       pages.forEach((p, i) => {
         const footerHtml = buildPageFooterHtml(i + 1, total, footerLineHTML, dynamicFontSize);
-        if (typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG) {
-          p.classList.add('has-apb-footer-img');
-          const wrap = document.createElement('div');
-          wrap.innerHTML = footerHtml;
-          const bottom = wrap.firstElementChild;
-          if (bottom) p.appendChild(bottom);
-        } else {
-          const wrap = document.createElement('div');
-          wrap.innerHTML = footerHtml;
-          const f = wrap.firstElementChild;
-          if (f) p.appendChild(f);
-        }
+        const showFooterImg = i === 0 && typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG;
+        if (showFooterImg) p.classList.add('has-apb-footer-img');
+        else p.classList.remove('has-apb-footer-img');
+        const wrap = document.createElement('div');
+        wrap.innerHTML = footerHtml;
+        const bottom = wrap.firstElementChild;
+        if (bottom) p.appendChild(bottom);
       });
     }
 
@@ -14712,8 +14709,7 @@ function getApbInfoTblExportCss() {
 }
 
 function getPaginatedExportCss() {
-  const hasFooterImg = typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG;
-  const pagePadBottom = hasFooterImg ? '32mm' : '25mm';
+  const footerImgPad = (typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG) ? '40mm' : '25mm';
   return `
     @page { size: A4 portrait; margin: 0; }
     .btn-page-break { display: none !important; }
@@ -14727,7 +14723,7 @@ function getPaginatedExportCss() {
     .preview-a4-page {
       width: 210mm;
       height: 297mm;
-      padding: 20mm 20mm ${pagePadBottom} 25mm;
+      padding: 20mm 20mm 25mm 25mm;
       margin: 0;
       box-shadow: none;
       background: #fff;
@@ -14736,6 +14732,9 @@ function getPaginatedExportCss() {
       page-break-after: always;
       page-break-inside: avoid;
       overflow: hidden;
+    }
+    .preview-a4-page.has-apb-footer-img {
+      padding-bottom: ${footerImgPad};
     }
     .preview-a4-page:last-child { page-break-after: auto; }
     .signature-section, .apb-doc-close {
