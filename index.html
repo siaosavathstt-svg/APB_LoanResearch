@@ -25,7 +25,11 @@
   --apb-page-pad-right: 20mm;
   --apb-page-pad-left: 25mm;
   --apb-ref-top: 36mm;    /* ຕຳແໜ່ງເລກທີຈາກເທິງເຫດເດີ */
-  --apb-ref-right: 14mm;  /* ຫ່າງຈາກຂອບຂວາເຈ້ຍ */
+  --apb-ref-right: 20mm;  /* ຊື່ກັບ margin ຂວາ 2cm / ຂອບຂວາບлокອີງຕາມ */
+  --apb-ref-font-size: 12pt;
+  --apb-head-unit-left: 18mm; /* ຊື່ພະແນກ/ສາຂາ ລຸ່ມໂລໂກ */
+  --apb-head-unit-top-extra: 4mm; /* ຍ້າຍລຸ່ມເພື່ອບໍ່ທັບເສັ້ນຂຽວເຫດເດີ */
+  --apb-head-unit-color: #000;
   --apb-letterhead-tail: 2mm; /* ຊ່ອງວ່າງລຸ່ມເຫດເດີກ່ອນຫົວຂໍ້ເອກະສານ */
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2645,15 +2649,27 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     }
     .apb-letterhead-zone > .apb-ref-row {
       position: absolute;
-      right: var(--apb-ref-right, 14mm);
+      right: var(--apb-ref-right, 20mm);
       top: var(--apb-ref-top, 36mm);
       margin: 0 !important;
       z-index: 2;
     }
+    .apb-letterhead-zone > .apb-head-unit-label {
+      position: absolute;
+      left: var(--apb-head-unit-left, 18mm);
+      top: calc(var(--apb-ref-top, 36mm) + 1.35em + var(--apb-head-unit-top-extra, 4mm));
+      margin: 0 !important;
+      font-size: var(--apb-ref-font-size, 12pt);
+      font-weight: 400;
+      color: var(--apb-head-unit-color, #000);
+      line-height: 1.35;
+      z-index: 2;
+      white-space: nowrap;
+    }
     .apb-ref-meta {
       margin-left: auto;
       border-collapse: collapse;
-      font-size: 11pt;
+      font-size: var(--apb-ref-font-size, 12pt);
       line-height: 1.35;
       border: 0 !important;
       border-color: #fff !important;
@@ -2687,7 +2703,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     /* Header strip (APB style) */
     .apb-hdr-country { text-align:center; font-weight:700; font-size:14pt; margin-bottom:2px; }
     .apb-hdr-motto { text-align:center; font-size:12pt; font-weight:600; margin-bottom:12px; text-decoration:underline; text-underline-offset:3px; }
-    .apb-ref-row { display:block; text-align:right; font-size:11pt; margin:0 0 10px; }
+    .apb-ref-row { display:block; text-align:right; font-size:var(--apb-ref-font-size, 12pt); margin:0 0 10px; }
     .apb-title { text-align:center; font-weight:700; font-size:16pt; margin:20px 0 4px; text-decoration:none; }
     .apb-letterhead-zone + .apb-title { margin-top: 6mm; }
     .apb-subtitle { text-align:center; font-size:13pt; font-weight:600; margin-bottom:14px; }
@@ -2820,6 +2836,8 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     .apb-info-tbl-sec12 td.val { width: auto; }
     .apb-info-tbl-sec12 tr.info-row-company .val { font-weight: 700 !important; font-style: normal !important; }
     .apb-info-tbl-sec12 tr.info-row-rep .val { font-weight: 700 !important; font-style: normal !important; }
+    .apb-info-tbl-sec12 tr.info-row-company .lbl,
+    .apb-info-tbl-sec12 tr.info-row-rep .lbl { font-weight: 700 !important; }
     .apb-info-tbl-sec12.apb-fee-align col.col-lbl { width: 340px; }
     .apb-info-tbl-sec12.apb-fee-align td.lbl { width: 340px; max-width: 340px; }
     .apb-info-tbl-sec12 .fee-amt-num {
@@ -7525,15 +7543,34 @@ function setDocHeaderImage(event) {
   event.target.value = '';
 }
 
-function applyFirstPageHeader(html) {
+function getLetterheadUnitLabel(D) {
+  if (!D) return 'ພະແນກສິນເຊື່ອ';
+  const dept = D.dept != null ? String(D.dept).trim() : '';
+  if (dept) return dept;
+  if (D.is_branch && D.branch_name) {
+    const b = String(D.branch_name).trim();
+    const u = String(D.unit_name || '').trim();
+    if (!b) return 'ພະແນກສິນເຊື່ອ';
+    return u ? `ໜ່ວຍ${u} ສາຂາ${b}` : `ສາຂາ${b}`;
+  }
+  return 'ພະແນກສິນເຊື່ອ';
+}
+function buildLetterheadUnitHtml(D) {
+  const label = getLetterheadUnitLabel(D);
+  if (!label) return '';
+  return `<div class="apb-head-unit-label">${escapeHtml(label)}</div>`;
+}
+
+function applyFirstPageHeader(html, D, includeUnitLabel) {
   const src = docHeaderImageDataUrl || DOC_HEADER_STATIC_SRC;
   if (!src) return html;
   const headerImg = `<div class="doc-first-header"><img src="${src}" alt="Document Header" style="width:210mm;max-width:210mm;height:auto;display:block;" onerror="this.closest('.apb-letterhead-zone')?.remove()"></div>`;
+  const unitHtml = includeUnitLabel && D ? buildLetterheadUnitHtml(D) : '';
   const refMatch = /^\s*<div class="apb-ref-row">[\s\S]*?<\/div>\s*/.exec(html);
   if (refMatch) {
-    return `<div class="apb-letterhead-zone">${headerImg}${refMatch[0]}</div>${html.slice(refMatch[0].length)}`;
+    return `<div class="apb-letterhead-zone">${headerImg}${unitHtml}${refMatch[0]}</div>${html.slice(refMatch[0].length)}`;
   }
-  return `<div class="apb-letterhead-zone">${headerImg}</div>${html}`;
+  return `<div class="apb-letterhead-zone">${headerImg}${unitHtml}</div>${html}`;
 }
 
 function normalizeLetterheadLayout(root) {
@@ -8399,10 +8436,10 @@ function buildDepNarrative(D) {
   } else {
     const parts = curKeys.map(curr => {
       const b = sum.byCurr[curr];
-      return `ສະກຸນ${curr}: ຖອນ ${fmtN(b.debit)}, ຝາກ ${fmtN(b.credit)}, ຍອດເຫຼືອ ${fmtN(b.bal)} (${b.count} ບັນຊີ)`;
+      return `ສະກຸນ${curr}: ຖອນ ${fmtN(b.debit)} ${curr}, ຝາກ ${fmtN(b.credit)} ${curr}, ຍອດເຫຼືອ ${fmtN(b.bal)} ${curr} (${b.count} ບັນຊີ)`;
     });
     s += `. ${parts.join('; ')}`;
-    s += `. ລວມທຽບເທົ່າກີບ: ຖອນ ${fmtN(sum.lakDebit)}, ຝາກ ${fmtN(sum.lakCredit)}, ຍອດເຫຼືອ ${fmtN(sum.lakBal)}`;
+    s += `. ລວມທຽບເທົ່າກີບ: ຖອນ ${fmtN(sum.lakDebit)} ກີບ, ຝາກ ${fmtN(sum.lakCredit)} ກີບ, ຍອດເຫຼືອ ${fmtN(sum.lakBal)} ກີບ`;
   }
   return finishNarrativeWithApx(s, D, 'dep');
 }
@@ -9077,12 +9114,12 @@ function buildResearchSignerTable(D) {
 function buildChairmanSignoffBlock() {
   return `<div class="signature-section"><table style="width:100%;border:none;margin-top:20px"><tr>
     <td style="border:none;vertical-align:bottom;width:50%;padding:8px 14px 0 0">
-      <div style="font-weight:700">ປະທານສະພາບໍລິຫານ</div>
+      <div style="font-weight:700;padding-left:12mm">ປະທານສະພາບໍລິຫານ</div>
       <div style="margin-top:60px">&nbsp;</div>
     </td>
     <td style="border:none;vertical-align:bottom;width:50%;text-align:right;padding:8px 0 0 14px">
-      <div style="margin-bottom:10px;line-height:1.45">ຮຽນມາດ້ວຍຄວາມເຄົາລົບ ແລະ ນັບຖືເປັນຢ່າງສູງ</div>
-      <div style="font-weight:700">ຜູ້ອຳນວຍການ</div>
+      <div style="margin-bottom:10px;line-height:1.45">ດ້ວຍຄວາມເຄົາລົບ ແລະ ນັບຖືຢ່າງສູງ</div>
+      <div style="font-weight:700;padding-right:12mm">ຜູ້ອຳນວຍການ</div>
       <div style="margin-top:60px">&nbsp;</div>
     </td>
   </tr></table></div>`;
@@ -9428,9 +9465,6 @@ function renderResearch(D, variant) {
 
   let h = '';
   if (isChair) {
-    const repLine = ((D.rep_pos || '').trim() && (D.rep || '').trim())
-      ? `${escapeHtml((D.rep_pos || '').trim())} ${escapeHtml((D.rep || '').trim())}`
-      : escapeHtml((D.rep || '').trim() || '...');
     h += apbRefRowHTML(
       `${D.a_chairman_no || '........'} /ທສກ`,
       D.a_chairman_date || '...........'
@@ -9455,7 +9489,7 @@ function renderResearch(D, variant) {
       <td style="vertical-align:top; padding:0;">ອີງຕາມ ໜັງສືສະເໜີ ຂໍກູ້ຢືມເງິນ ຂອງ ${subjBiz}.</td>
     </tr>
   </table>`;
-    h += `<p style="text-indent:40px;text-align:justify;margin:10px 0"><strong>ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ (ທສກ)</strong> ຂໍຖືເປັນກຽດຮຽນລາຍງານມາຍັງທ່ານ ປະທານສະພາບໍລິຫານ ກ່ຽວກັບການສະເໜີຂໍສິນເຊື່ອ ຂອງ <strong>${subjBiz}</strong> (ຕາງໜ້າໂດຍ <strong>${repLine}</strong>), ລາຍລະອຽດ ດັ່ງນີ້:</p>`;
+    h += `<p style="text-indent:40px;text-align:justify;margin:10px 0"><strong>ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ (ທສກ)</strong> ຂໍຖືເປັນກຽດຮຽນລາຍງານມາຍັງທ່ານ ກ່ຽວກັບການສະເໜີຂໍສິນເຊື່ອ ຂອງ <strong>${subjBiz}</strong>, ລາຍລະອຽດ ດັ່ງນີ້:</p>`;
   } else {
     if (D.is_branch) {
       const _bLoc = D.branch_name ? (D.branch_name.trim() === 'ນະຄອນຫຼວງວຽງຈັນ' ? escapeHtml(D.branch_name) : `ແຂວງ${escapeHtml(D.branch_name)}`) : '............';
@@ -9477,10 +9511,6 @@ function renderResearch(D, variant) {
     h += `<p style="margin:8px 0 8px 20mm"><strong>ຮຽນ: ${_reportTo}, ທີ່ນັບຖືຢ່າງສູງ</strong></p>`;
     h += `<p style="margin:6px 0 6px 20mm"><strong>ເລື່ອງ: ການສະເໜີຂໍສິນເຊື່ອຂອງລູກຄ້າ.</strong></p>`;
     h += `<table style="width:calc(100% - 10mm); margin:8px 0 8px 10mm; border-collapse:collapse;">
-    <tr>
-      <td style="width:6mm; vertical-align:top; padding:0;">-</td>
-      <td style="vertical-align:top; padding:0;">ອີງຕາມ ໃບທະບຽນວິສາຫະກິດ ເລກທີ ${D.biz_reg||'...'} ລົງວັນທີ ${D.biz_reg_date||'...'}, ອອກໂດຍ ${D.biz_issued||'...'};</td>
-    </tr>
     <tr>
       <td style="width:6mm; vertical-align:top; padding:0;">-</td>
       <td style="vertical-align:top; padding:0;">ອີງຕາມ ໃບສະເໜີຂໍກູ້ຢືມຂອງບໍລິສັດ ສະບັບເລກທີ ${D.req_ref||'...'} ລົງວັນທີ ${D.req_date||'...'};</td>
@@ -10428,8 +10458,9 @@ function buildVipOwnerHistory(D) {
   if (birth) seg.push(`ເກີດທີ່ ${birth}`);
   const cur = [addr('ບ້ານ', D.c_cur_v), addr('ເມືອງ', D.c_cur_d), addr('ແຂວງ', D.c_cur_p)].filter(Boolean).join(', ');
   if (cur) seg.push(`ປັດຈຸບັນຢູ່ ${cur}`);
-  const edu = [has(D.c_edu) ? `ການສຶກສາ ${D.c_edu}` : '', has(D.c_edu_major) ? `ສາຂາ ${D.c_edu_major}` : ''].filter(Boolean).join(' ');
-  if (has(D.c_job) || edu) seg.push([has(D.c_job) ? `ອາຊີບ ${D.c_job}` : '', edu].filter(Boolean).join(', '));
+  const edu = [has(D.c_edu) ? `ການສຶກສາ ${D.c_edu}` : '', has(D.c_edu_major) ? `ສາຂາ ${D.c_edu_major}` : ''].filter(Boolean).join(', ');
+  if (has(D.c_job)) seg.push(`ອາຊີບ ${D.c_job}`);
+  if (edu) seg.push(edu);
   const idPart = [has(D.c_id) ? `ບັດປະຈຳໂຕເລກທີ ${D.c_id}` : '', has(D.c_id_date) ? `ລົງວັນທີ ${fmtDMY(D.c_id_date) || D.c_id_date}` : '', has(D.c_id_by) ? `ອອກໂດຍ ${D.c_id_by}` : ''].filter(Boolean).join(' ');
   if (idPart) seg.push(idPart);
   const regPart = [has(D.c_reg) ? `ສຳມະໂນຄົວເລກທີ ${D.c_reg}` : '', has(D.c_reg_date) ? `ລົງວັນທີ ${fmtDMY(D.c_reg_date) || D.c_reg_date}` : ''].filter(Boolean).join(' ');
@@ -10444,7 +10475,7 @@ function buildVipOwnerHistory(D) {
     if (Number.isFinite(dgN) && dgN >= 0) famParts.push(`(ຍິງ ${dgN} ຄົນ)`);
   }
   if (famParts.length) seg.push(famParts.join(' '));
-  return seg.join(' ') + (seg.length ? '.' : '');
+  return seg.join(', ') + (seg.length ? '.' : '');
 }
 
 function _patchTextNodes(el, re, replacement) {
@@ -12304,7 +12335,7 @@ function generateDoc() {
     else if (currentDoc === 'minutes550_vote') html = renderPostApprovalDoc(D, 'minutes550_vote');
     else if (currentDoc === 'withdraw_proposal') html = renderPostApprovalDoc(D, 'withdraw_proposal');
     else if (currentDoc === 'withdraw_long') html = renderPostApprovalDoc(D, 'withdraw_long');
-    if (currentDoc !== 'vote_ballot' && currentDoc !== 'minutes550_vote' && currentDoc !== 'appendix') html = applyFirstPageHeader(html);
+    if (currentDoc !== 'vote_ballot' && currentDoc !== 'minutes550_vote' && currentDoc !== 'appendix') html = applyFirstPageHeader(html, D, currentDoc === 'research');
     const previewEl = document.getElementById('doc_preview');
     previewEl.classList.remove('paginated-mode', 'appendix-mode');
     previewEl.innerHTML = html;
@@ -14695,6 +14726,8 @@ function getApbInfoTblExportCss() {
     .apb-info-tbl-sec12 td.val { width:auto; }
     .apb-info-tbl-sec12 tr.info-row-company .val { font-weight:700 !important; font-style:normal !important; }
     .apb-info-tbl-sec12 tr.info-row-rep .val { font-weight:700 !important; font-style:normal !important; }
+    .apb-info-tbl-sec12 tr.info-row-company .lbl,
+    .apb-info-tbl-sec12 tr.info-row-rep .lbl { font-weight:700 !important; }
     .apb-info-tbl-sec12.apb-fee-align col.col-lbl { width:340px; }
     .apb-info-tbl-sec12.apb-fee-align td.lbl { width:340px; max-width:340px; }
     .apb-info-tbl-sec12 .fee-amt-num { display:inline-block; min-width:110px; text-align:right; }
@@ -14853,15 +14886,27 @@ function getPaginatedExportCss() {
     }
     .apb-letterhead-zone > .apb-ref-row {
       position: absolute;
-      right: var(--apb-ref-right, 14mm);
+      right: var(--apb-ref-right, 20mm);
       top: var(--apb-ref-top, 36mm);
       margin: 0 !important;
       z-index: 2;
     }
+    .apb-letterhead-zone > .apb-head-unit-label {
+      position: absolute;
+      left: var(--apb-head-unit-left, 18mm);
+      top: calc(var(--apb-ref-top, 36mm) + 1.35em + var(--apb-head-unit-top-extra, 4mm));
+      margin: 0 !important;
+      font-size: var(--apb-ref-font-size, 12pt);
+      font-weight: 400;
+      color: var(--apb-head-unit-color, #000);
+      line-height: 1.35;
+      z-index: 2;
+      white-space: nowrap;
+    }
     .apb-ref-meta {
       margin-left: auto;
       border-collapse: collapse;
-      font-size: 11pt;
+      font-size: var(--apb-ref-font-size, 12pt);
       line-height: 1.35;
       border: 0 !important;
       border-color: #fff !important;
@@ -14892,7 +14937,7 @@ function getPaginatedExportCss() {
     .apb-ref-colon { text-align: left; width: 0.6em; padding: 0 4px 0 0; white-space: nowrap; }
     .apb-ref-value { text-align: left; white-space: nowrap; }
     .apb-hdr-country, .apb-hdr-motto { text-align:center; font-weight:700; }
-    .apb-ref-row { display:block; text-align:right; font-size:11pt; margin:0 0 10px; }
+    .apb-ref-row { display:block; text-align:right; font-size:var(--apb-ref-font-size, 12pt); margin:0 0 10px; }
     .apb-title { text-align:center; font-size:16pt; font-weight:700; margin:20px 0 4px; text-decoration:none; }
     .apb-letterhead-zone + .apb-title { margin-top: 6mm; }
     .apb-subtitle { text-align:center; font-size:13pt; font-weight:600; margin-bottom:14px; }
@@ -15048,15 +15093,27 @@ async function printHtmlTemplate(content, title) {
     }
     .apb-letterhead-zone > .apb-ref-row {
       position: absolute;
-      right: var(--apb-ref-right, 14mm);
+      right: var(--apb-ref-right, 20mm);
       top: var(--apb-ref-top, 36mm);
       margin: 0 !important;
       z-index: 2;
     }
+    .apb-letterhead-zone > .apb-head-unit-label {
+      position: absolute;
+      left: var(--apb-head-unit-left, 18mm);
+      top: calc(var(--apb-ref-top, 36mm) + 1.35em + var(--apb-head-unit-top-extra, 4mm));
+      margin: 0 !important;
+      font-size: var(--apb-ref-font-size, 12pt);
+      font-weight: 400;
+      color: var(--apb-head-unit-color, #000);
+      line-height: 1.35;
+      z-index: 2;
+      white-space: nowrap;
+    }
     .apb-ref-meta {
       margin-left: auto;
       border-collapse: collapse;
-      font-size: 11pt;
+      font-size: var(--apb-ref-font-size, 12pt);
       line-height: 1.35;
       border: 0 !important;
       border-color: #fff !important;
@@ -15086,7 +15143,7 @@ async function printHtmlTemplate(content, title) {
     .apb-ref-label { text-align: right; white-space: nowrap; }
     .apb-ref-colon { text-align: left; width: 0.6em; padding: 0 4px 0 0; white-space: nowrap; }
     .apb-ref-value { text-align: left; white-space: nowrap; }
-    .apb-ref-row { display:block; text-align:right; font-size:11pt; margin:0 0 10px; }
+    .apb-ref-row { display:block; text-align:right; font-size:var(--apb-ref-font-size, 12pt); margin:0 0 10px; }
     .apb-title { text-align:center; font-size:16pt; font-weight:700; margin:20px 0 4px; text-decoration:none; }
     .apb-letterhead-zone + .apb-title { margin-top: 6mm; }
     .apb-subtitle { text-align:center; font-size:13pt; font-weight:600; margin-bottom:14px; }
@@ -15814,15 +15871,27 @@ function downloadWord() {
     }
     .apb-letterhead-zone > .apb-ref-row {
       position: absolute;
-      right: var(--apb-ref-right, 14mm);
+      right: var(--apb-ref-right, 20mm);
       top: var(--apb-ref-top, 36mm);
       margin: 0 !important;
       z-index: 2;
     }
+    .apb-letterhead-zone > .apb-head-unit-label {
+      position: absolute;
+      left: var(--apb-head-unit-left, 18mm);
+      top: calc(var(--apb-ref-top, 36mm) + 1.35em + var(--apb-head-unit-top-extra, 4mm));
+      margin: 0 !important;
+      font-size: var(--apb-ref-font-size, 12pt);
+      font-weight: 400;
+      color: var(--apb-head-unit-color, #000);
+      line-height: 1.35;
+      z-index: 2;
+      white-space: nowrap;
+    }
     .apb-ref-meta {
       margin-left: auto;
       border-collapse: collapse;
-      font-size: 11pt;
+      font-size: var(--apb-ref-font-size, 12pt);
       line-height: 1.35;
       border: 0 !important;
       border-color: #fff !important;
@@ -15852,7 +15921,7 @@ function downloadWord() {
     .apb-ref-label { text-align: right; white-space: nowrap; }
     .apb-ref-colon { text-align: left; width: 0.6em; padding: 0 4px 0 0; white-space: nowrap; }
     .apb-ref-value { text-align: left; white-space: nowrap; }
-    .apb-ref-row { display:block; text-align:right; font-size:11pt; margin:0 0 10px; }
+    .apb-ref-row { display:block; text-align:right; font-size:var(--apb-ref-font-size, 12pt); margin:0 0 10px; }
     .apb-sec-head { font-weight: 700; font-size: 12pt; margin: 14px 0 6px; text-decoration: none; break-after:avoid-page; page-break-after:avoid; }
     .apb-mt { font-weight: 700; font-size: 12.5pt; margin: 14px 0 4px; text-decoration: none; }
     .apb-sec-head-unit-row { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin:14px 0 6px; break-after:avoid-page; page-break-after:avoid; }
