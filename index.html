@@ -1058,6 +1058,13 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     <div class="card-body">
       <div class="info-note">ℹ️ ທີ່ດິນ/ອາຄານ: ມູນຄ່າລວມ = ເນື້ອທີ່ × ລາຄາ/ມ² ຫຼື ປ້ອນມູນຄ່າໂດຍກົງ · ຝາກ/ລົດ/ໂຄງການ: ປ້ອນມູນຄ່າຮັບຮອງໂດຍກົງ · ອັດຕາຮັບຮອງຕາມແບບປະເມີນ v20 (ດິນ 70% · ດິນປຸກສ້າງ-ທີ່ຢູ່ອາໄສ 60% · ຫ້ອງການ 50% · ຝາກLAK 90% · ຝາກFX 80% · ລົດ 50% · ໂຄງການ 50% · ໜີ້ຕ້ອງຮັບ 70%)</div>
 
+      <div class="sec-lbl-sub" style="margin-top:8px">🏗️ ໂໝດປະເມີນຫຼັກຊັບ</div>
+      <div style="display:grid;gap:6px 14px;margin:0 0 12px;padding:10px 12px;background:#fff8f0;border-left:3px solid #c8921a;border-radius:4px;font-size:12px">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer"><input type="radio" name="col_valuation_mode" value="standard" checked onchange="onColValuationModeChanged()"> <span><strong>ແບບມາດຕະຖານ</strong> — ຕາຕະລາງດິນ/ອາຄານ/ຝາກ/ລົດ (ຄ່າເລີ່ມ)</span></label>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer"><input type="radio" name="col_valuation_mode" value="project" onchange="onColValuationModeChanged()"> <span><strong>ໂຄງການຄ້ຳ</strong> — ລາຍຮັບ 60% · ອາຄານ/ເຄື່ອງຈັກ 50% · ຫັກຄ້ຳເກົ່າ · ເລືອກສະກຸນເງິນ</span></label>
+        <input type="hidden" id="col_valuation_mode" value="standard">
+      </div>
+
       <div class="sec-lbl-sub" style="margin-top:4px">📄 ຮູບແບບສະແດງ V. ຫຼັກຊັບຄ້ຳປະກັນ (ບົດຄົ້ນຄວ້າ + ໜັງສືປະທານ)</div>
       <div style="display:grid;gap:6px 14px;margin:0 0 12px;padding:10px 12px;background:#f4f8f8;border-left:3px solid #006b6b;border-radius:4px;font-size:12px">
         <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer"><input type="radio" name="col_display_mode" value="text" checked onchange="onColDisplayModeChanged()"> <span><strong>ແບບ 1 — ຂໍ້ຄວາມວິເຄາະ</strong> (ຄ່າເລີ່ມ · ອັບເດດອັດຕະໂນມັດຈາກຕາຕະລາງ · ແກ້ໄຂໄດ້ · ຕາຕະລາງ → ຄັດຕິດ)</span></label>
@@ -1074,6 +1081,64 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
         <textarea id="col_display_text" rows="6" placeholder="ຂໍ້ຄວາມວິເຄາະຫຼັກຊັບ — ອັບເດດອັດຕະໂນມັດຈາກຕາຕະລາງ (ແກ້ໄຂເອງໄດ້)..." oninput="onColDisplayTextInput()"></textarea>
       </div>
 
+      <div id="col_project_panel" style="display:none;margin-bottom:14px;padding:12px 14px;background:#f8faf8;border:1px solid #c8ddd8;border-radius:6px">
+        <div class="sec-lbl-sub" style="margin-top:0">🏗️ ໂຄງການຄ້ຳ — ປ້ອນມູນຄ່າປະເມີນ</div>
+        <div class="grid g4" style="margin-bottom:10px">
+          <div class="field"><label>ສະກຸນເງິນປ້ອນ/ສະແດງ</label>
+            <select id="col_proj_currency" onchange="calcColProjectTotals()"><option value="LAK" selected>ກີບ (LAK)</option><option value="USD">ໂດລາ (USD)</option><option value="THB">ບາດ (THB)</option></select>
+          </div>
+          <div class="field"><label>ວັນກຳນົດອັດຕາ</label><input type="date" id="col_proj_rate_date" onchange="calcColProjectTotals()"></div>
+          <div class="field"><label>USD/ກີບ</label><input type="number" id="col_proj_usd_rate" class="mono" step="0.01" oninput="calcColProjectTotals()"></div>
+          <div class="field"><label>THB/ກີບ</label><input type="number" id="col_proj_thb_rate" class="mono" step="0.01" oninput="calcColProjectTotals()"></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="dtable" id="col_project_table">
+            <thead><tr>
+              <th style="width:34px">ລ/ດ</th>
+              <th style="min-width:220px">ເນື້ອໃນລາຍການຫຼັກຊັບ</th>
+              <th style="min-width:140px">ມູນຄ່າ</th>
+              <th style="width:70px">LTV%</th>
+              <th style="width:34px"></th>
+            </tr></thead>
+            <tbody id="col_project_body">
+              <tr>
+                <td style="text-align:center;font-weight:700;color:#555">1</td>
+                <td><input type="text" class="col-proj-item" value="ລາຍຮັບຈາກການດຳເນີນໂຄງການ" style="width:100%" oninput="calcColProjectTotals()"></td>
+                <td><input type="text" inputmode="decimal" class="mono fnum col-proj-val" placeholder="0" oninput="calcColProjectTotals()"></td>
+                <td><input type="number" class="mono col-proj-ltv" value="60" min="0" max="100" step="0.5" style="width:52px;text-align:center" oninput="calcColProjectTotals()"></td>
+                <td><button type="button" class="del-btn" onclick="delColProjectRow(this)">✕</button></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;font-weight:700;color:#555">2</td>
+                <td><input type="text" class="col-proj-item" value="ມູນຄ່າອາຄານ ແລະ ສິ່ງປຸກສ້າງ" style="width:100%" oninput="calcColProjectTotals()"></td>
+                <td><input type="text" inputmode="decimal" class="mono fnum col-proj-val" placeholder="0" oninput="calcColProjectTotals()"></td>
+                <td><input type="number" class="mono col-proj-ltv" value="50" min="0" max="100" step="0.5" style="width:52px;text-align:center" oninput="calcColProjectTotals()"></td>
+                <td><button type="button" class="del-btn" onclick="delColProjectRow(this)">✕</button></td>
+              </tr>
+              <tr>
+                <td style="text-align:center;font-weight:700;color:#555">3</td>
+                <td><input type="text" class="col-proj-item" value="ມູນຄ່າເຄື່ອງຈັກ ແລະ ອຸປະກອນ" style="width:100%" oninput="calcColProjectTotals()"></td>
+                <td><input type="text" inputmode="decimal" class="mono fnum col-proj-val" placeholder="0" oninput="calcColProjectTotals()"></td>
+                <td><input type="number" class="mono col-proj-ltv" value="50" min="0" max="100" step="0.5" style="width:52px;text-align:center" oninput="calcColProjectTotals()"></td>
+                <td><button type="button" class="del-btn" onclick="delColProjectRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" style="margin-top:8px" onclick="addColProjectRow()">+ ເພີ່ມລາຍການ</button>
+        <div class="grid g3" style="margin-top:10px">
+          <div class="field"><label>ຈຳນວນສັນຍາຄ້ຳເກົ່າ</label><input type="text" id="col_proj_prior_contracts" class="mono" placeholder="03" oninput="calcColProjectTotals()"></div>
+          <div class="field"><label>ມູນຄ່າຄ້ຳແລ້ວ (ກັບ ທສກ)</label><input type="text" id="col_proj_prior_guaranteed" inputmode="decimal" class="mono fnum" placeholder="0" oninput="calcColProjectTotals()"></div>
+          <div class="field"><label>ໝາຍເຫດເພີ່ມ</label><input type="text" id="col_proj_remark_extra" placeholder="(ຖ້າມີ)" oninput="calcColProjectTotals()"></div>
+        </div>
+        <div class="grid g3" style="margin-top:8px">
+          <div class="field"><label>ລວມມູນຄ່າຫຼັກຊັບທັງໝົດ</label><input type="text" id="col_proj_gross" readonly class="mono" value="0"></div>
+          <div class="field"><label>ລວມຄ້ຳໄດ້ສູງສຸດ (ກ່ອນຫັກເກົ່າ)</label><input type="text" id="col_proj_max_guarantee" readonly class="mono" value="0"></div>
+          <div class="field"><label style="font-weight:800;color:var(--g-dark)">ສາມາດຄ້ຳປະກັນໄດ້ສູງສຸດ</label><input type="text" id="col_proj_net_available" readonly class="mono" style="font-weight:800;color:var(--g-dark);background:var(--g-pale)" value="0"></div>
+        </div>
+      </div>
+
+      <div id="col_standard_wrap">
       <div style="overflow-x:auto">
         <table class="dtable" id="col_table">
           <thead>
@@ -1135,9 +1200,10 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
         </label>
       </div>
       <div class="info-note" style="margin-top:8px">ℹ️ ໃນ <strong>apb-valuation-v20</strong> ກົດ <strong>«📤 JSON → ກູ້»</strong> — ສົ່ງທີ່ດິນ, ອາຄານ, ຫຼັກຊັບອື່ນ (ຝາກ/ລົດ), ແລະ ໂຄງການ/ໜີ້ຕ້ອງຮັບ ຕາມທີ່ມີໃນປະເມີນ</div>
+      </div><!-- /col_standard_wrap -->
 
       <div class="sec-lbl-sub" style="margin-top:14px">💰 ສະຫຼຸບມູນຄ່າ (ຕາມແບບຮັບຮອງທະນາຄານ) — ສະແດງສະເພາະປະເພດທີ່ມີມູນຄ່າ</div>
-      <div class="grid g4">
+      <div id="col_standard_summary_wrap" class="grid g4">
         <div class="field" id="col_field_land_gross"><label>ລວມມູນຄ່າທີ່ດິນຄ້ຳປະກັນ</label><input type="text" id="col_land_total" readonly class="mono" value="9,750,000,000"></div>
         <div class="field" id="col_field_bld_gross"><label>ລວມມູນຄ່າດິນປຸກສ້າງ-ທີ່ຢູ່ອາໄສ</label><input type="text" id="col_bld_total" readonly class="mono" value="3,346,400,000"></div>
         <div class="field" id="col_field_off_gross" style="display:none"><label>ລວມມູນຄ່າຫ້ອງການ</label><input type="text" id="col_off_total" readonly class="mono" value="0"></div>
@@ -1153,6 +1219,10 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
         <input type="hidden" id="col_vehicle_max" value="0">
         <input type="hidden" id="col_project_max" value="0">
         <input type="hidden" id="col_project_recv_max" value="0">
+      </div>
+
+      <div id="col_project_summary_wrap" style="display:none;margin-bottom:8px;padding:10px 12px;background:#f0faf5;border-left:3px solid #0d6e5c;border-radius:4px;font-size:12px">
+        <div>ℹ️ ໂໝດ <strong>ໂຄງການຄ້ຳ</strong> — «ລວມຄ້ຳປະກັນສູງສຸດ» ໃນເອກະສານ = <strong>ເຫຼືອຄ້ຳໄດ້</strong> (ຫຼັງຫັກຄ້ຳເກົ່າ) · sync ໄປ «ລວມມູນຄ່າຄ້ຳປະກັນສູງສຸດ» ເປັນກີບ</div>
       </div>
 
       <div class="grid g3" style="margin-top:14px">
@@ -3161,6 +3231,15 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     .apb-col-fit-tbl .c-fit {
       white-space: nowrap !important;
     }
+    /* ໂຄງການຄ້ຳ — ໂຕທຳມະດາ, ບໍ່ເຂັມ */
+    .apb-proj-col-tbl th,
+    .apb-proj-col-tbl td {
+      font-weight: 400 !important;
+    }
+    .apb-proj-col-tbl .apb-proj-remark {
+      vertical-align: top !important;
+      line-height: 1.45 !important;
+    }
     .apb-col-src-tbl {
       table-layout: fixed !important;
       font-size: 8pt !important;
@@ -3217,6 +3296,15 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     .apb-col-fit-tbl .c-num,
     .apb-col-fit-tbl .c-fit {
       white-space: nowrap !important;
+    }
+    /* ໂຄງການຄ້ຳ — ໂຕທຳມະດາ, ບໍ່ເຂັມ */
+    .apb-proj-col-tbl th,
+    .apb-proj-col-tbl td {
+      font-weight: 400 !important;
+    }
+    .apb-proj-col-tbl .apb-proj-remark {
+      vertical-align: top !important;
+      line-height: 1.45 !important;
     }
     .apb-col-src-tbl {
       table-layout: fixed !important;
@@ -4555,7 +4643,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   if (typeof syncColTypeSelects === 'function') syncColTypeSelects();
-  if (typeof calcColTotals === 'function') calcColTotals();
+  if (typeof onColValuationModeChanged === 'function') onColValuationModeChanged();
+  else if (typeof calcColTotals === 'function') calcColTotals();
   if (typeof initCibThbLink === 'function') initCibThbLink();
   // Sync Page 1 → Page 13 (ວົງເງິນ, ໄລຍະ, ດອກ, ເປົ້າ, ແຜນ)
   [['f_amount','ap_amount'],['f_term','ap_term'],['f_rate','ap_rate'],
@@ -5962,6 +6051,338 @@ function parseColKip(s) {
   if (s === '' || s == null || s === undefined) return 0;
   return parseFloat(String(s).replace(/,/g, '').trim()) || 0;
 }
+
+// ── ໂຄງການຄ້ຳ (col_valuation_mode = project) — ແຍກຈາກ calcColTotals ──
+function getColValuationMode() {
+  return document.querySelector('input[name="col_valuation_mode"]:checked')?.value
+    || document.getElementById('col_valuation_mode')?.value || 'standard';
+}
+function colProjectCurrencyLabel(cur) {
+  if (cur === 'USD') return 'ໂດລາ';
+  if (cur === 'THB') return 'ບາດ';
+  return 'ກີບ';
+}
+function colProjectCurrencyHdr(cur) {
+  if (cur === 'USD') return 'ມູນຄ່າຫຼັກຊັບ (ໂດລາ)';
+  if (cur === 'THB') return 'ມູນຄ່າຫຼັກຊັບ (ບາດ)';
+  return 'ມູນຄ່າຫຼັກຊັບ (ກີບ)';
+}
+function colProjectPrefillRates() {
+  const usdEl = document.getElementById('col_proj_usd_rate');
+  const thbEl = document.getElementById('col_proj_thb_rate');
+  if (usdEl && !String(usdEl.value || '').trim()) {
+    const cib = document.getElementById('cib_usd_rate');
+    if (cib && cib.value) usdEl.value = cib.value;
+  }
+  if (thbEl && !String(thbEl.value || '').trim()) {
+    const cib = document.getElementById('cib_thb_rate');
+    if (cib && cib.value) thbEl.value = cib.value;
+  }
+  const dtEl = document.getElementById('col_proj_rate_date');
+  if (dtEl && !dtEl.value) dtEl.value = new Date().toISOString().slice(0, 10);
+}
+var COL_PROJECT_DEFAULT_ITEMS = [
+  { item: 'ລາຍຮັບຈາກການດຳເນີນໂຄງການ', value: '', ltv_pct: 60 },
+  { item: 'ມູນຄ່າອາຄານ ແລະ ສິ່ງປຸກສ້າງ', value: '', ltv_pct: 50 },
+  { item: 'ມູນຄ່າເຄື່ອງຈັກ ແລະ ອຸປະກອນ', value: '', ltv_pct: 50 }
+];
+function buildColProjectRowTr(row, idx) {
+  const tr = document.createElement('tr');
+  const item = row.item != null ? String(row.item) : '';
+  const val = row.value != null && row.value !== '' ? escapeHtml(String(row.value)) : '';
+  let ltv = row.ltv_pct != null && row.ltv_pct !== '' ? parseFloat(String(row.ltv_pct).replace(/%/g, '')) : 50;
+  if (isNaN(ltv) || ltv <= 0) ltv = 50;
+  tr.innerHTML =
+    `<td style="text-align:center;font-weight:700;color:#555">${idx + 1}</td>` +
+    `<td><input type="text" class="col-proj-item" value="${escapeHtml(item)}" style="width:100%" oninput="calcColProjectTotals()"></td>` +
+    `<td><input type="text" inputmode="decimal" class="mono fnum col-proj-val" value="${val}" placeholder="0" oninput="calcColProjectTotals()"></td>` +
+    `<td><input type="number" class="mono col-proj-ltv" value="${Math.round(ltv)}" min="0" max="100" step="0.5" style="width:52px;text-align:center" oninput="calcColProjectTotals()"></td>` +
+    `<td><button type="button" class="del-btn" onclick="delColProjectRow(this)">✕</button></td>`;
+  return tr;
+}
+function initColProjectBody(rows) {
+  const tb = document.getElementById('col_project_body');
+  if (!tb) return;
+  const src = (rows && rows.length) ? rows : COL_PROJECT_DEFAULT_ITEMS;
+  tb.innerHTML = '';
+  src.forEach((r, i) => tb.appendChild(buildColProjectRowTr(r, i)));
+}
+function addColProjectRow(item, value, ltv) {
+  const tb = document.getElementById('col_project_body');
+  if (!tb) return;
+  tb.appendChild(buildColProjectRowTr({
+    item: item != null ? item : '',
+    value: value != null ? value : '',
+    ltv_pct: ltv != null ? ltv : 50
+  }, tb.rows.length));
+  renumberColProjectRows();
+  calcColProjectTotals();
+}
+function delColProjectRow(btn) {
+  const tb = document.getElementById('col_project_body');
+  if (!tb) return;
+  if (tb.rows.length <= 1) {
+    if (typeof showToast === 'function') showToast('⚠️ ຕ້ອງມີຢ່າງໜ້ອຍ 1 ແຖວ');
+    return;
+  }
+  btn.closest('tr').remove();
+  renumberColProjectRows();
+  calcColProjectTotals();
+}
+function renumberColProjectRows() {
+  document.querySelectorAll('#col_project_body tr').forEach((tr, i) => {
+    const td = tr.querySelector('td:first-child');
+    if (td && !td.querySelector('input')) td.textContent = i + 1;
+  });
+}
+function readColProjectItemsFromDOM() {
+  const items = [];
+  document.querySelectorAll('#col_project_body tr').forEach(tr => {
+    const itemIn = tr.querySelector('.col-proj-item');
+    const valIn = tr.querySelector('.col-proj-val');
+    const ltvIn = tr.querySelector('.col-proj-ltv');
+    if (!itemIn && !valIn) return;
+    items.push({
+      item: itemIn?.value || '',
+      value: parseN(valIn?.value),
+      ltv_pct: parseN(ltvIn?.value) || 50
+    });
+  });
+  return items;
+}
+function colProjectNormalizeItems(cp) {
+  cp = cp || {};
+  if (Array.isArray(cp.items) && cp.items.length) {
+    return cp.items.map(r => ({
+      item: String(r.item || ''),
+      value: parseColKip(r.value),
+      ltv_pct: parseColKip(r.ltv_pct) || 50,
+      ltvVal: Math.round(parseColKip(r.value) * (parseColKip(r.ltv_pct) || 50) / 100)
+    }));
+  }
+  if (cp.income != null || cp.building != null || cp.machinery != null ||
+      cp.ltv_income != null || cp.ltv_building != null || cp.ltv_machinery != null) {
+    return [
+      { item: 'ລາຍຮັບຈາກການດຳເນີນໂຄງການ', value: parseColKip(cp.income), ltv_pct: parseColKip(cp.ltv_income) || 60 },
+      { item: 'ມູນຄ່າອາຄານ ແລະ ສິ່ງປຸກສ້າງ', value: parseColKip(cp.building), ltv_pct: parseColKip(cp.ltv_building) || 50 },
+      { item: 'ມູນຄ່າເຄື່ອງຈັກ ແລະ ອຸປະກອນ', value: parseColKip(cp.machinery), ltv_pct: parseColKip(cp.ltv_machinery) || 50 }
+    ].map(r => Object.assign(r, { ltvVal: Math.round(r.value * r.ltv_pct / 100) }));
+  }
+  return COL_PROJECT_DEFAULT_ITEMS.map(r => Object.assign({}, r, {
+    value: parseColKip(r.value),
+    ltvVal: Math.round(parseColKip(r.value) * (parseColKip(r.ltv_pct) || 50) / 100)
+  }));
+}
+function restoreColProjectBodyFromData(data) {
+  const tb = document.getElementById('col_project_body');
+  if (!tb) return;
+  if (data && data['__col_project_body']) {
+    try {
+      const rows = JSON.parse(data['__col_project_body']);
+      if (rows.length) {
+        initColProjectBody(rows.map(r => ({
+          item: r[0] != null ? r[0] : '',
+          value: r[1] != null ? r[1] : '',
+          ltv_pct: r[2] != null ? r[2] : 50
+        })));
+        return;
+      }
+    } catch (e) { console.warn('[col_project_body restore]', e); }
+  }
+  if (data && (data.col_proj_income != null || data.col_proj_building != null || data.col_proj_machinery != null)) {
+    initColProjectBody([
+      { item: 'ລາຍຮັບຈາກການດຳເນີນໂຄງການ', value: data.col_proj_income || '', ltv_pct: data.col_proj_ltv_income || 60 },
+      { item: 'ມູນຄ່າອາຄານ ແລະ ສິ່ງປຸກສ້າງ', value: data.col_proj_building || '', ltv_pct: data.col_proj_ltv_building || 50 },
+      { item: 'ມູນຄ່າເຄື່ອງຈັກ ແລະ ອຸປະກອນ', value: data.col_proj_machinery || '', ltv_pct: data.col_proj_ltv_machinery || 50 }
+    ]);
+    return;
+  }
+  if (!tb.rows.length) initColProjectBody();
+}
+function readColProjectFromDOM() {
+  const g = id => document.getElementById(id)?.value ?? '';
+  const gn = id => parseN(document.getElementById(id)?.value);
+  return {
+    currency: g('col_proj_currency') || 'LAK',
+    rate_date: g('col_proj_rate_date'),
+    usd_rate: gn('col_proj_usd_rate') || parseN(document.getElementById('cib_usd_rate')?.value) || 21688,
+    thb_rate: gn('col_proj_thb_rate') || parseN(document.getElementById('cib_thb_rate')?.value) || 648.5,
+    items: readColProjectItemsFromDOM(),
+    prior_contracts: g('col_proj_prior_contracts'),
+    prior_guaranteed: gn('col_proj_prior_guaranteed'),
+    remark_extra: g('col_proj_remark_extra')
+  };
+}
+function getColProjectFromD(D) {
+  if (D && D.colProject && typeof D.colProject === 'object') return D.colProject;
+  if (typeof readColProjectFromDOM === 'function') return readColProjectFromDOM();
+  return {};
+}
+function calcColProjectFromData(cp) {
+  cp = cp || {};
+  const items = colProjectNormalizeItems(cp).map(it => {
+    const v = parseColKip(it.value);
+    const pct = parseColKip(it.ltv_pct) || 50;
+    return Object.assign({}, it, { value: v, ltv_pct: pct, ltvVal: Math.round(v * pct / 100) });
+  });
+  const prior = parseColKip(cp.prior_guaranteed);
+  let gross = 0, maxGuarantee = 0;
+  items.forEach(it => { gross += it.value; maxGuarantee += it.ltvVal; });
+  const netAvailable = Math.max(0, maxGuarantee - prior);
+  return { gross, maxGuarantee, netAvailable, items, ltvRows: items.filter(it => it.value > 0 || String(it.item || '').trim()) };
+}
+function colProjectToLAK(amount, currency, rates) {
+  const n = parseColKip(amount);
+  const cur = currency || 'LAK';
+  const usd = parseFloat(rates?.usd_rate) || 21688;
+  const thb = parseFloat(rates?.thb_rate) || 648.5;
+  if (cur === 'USD') return Math.round(n * usd);
+  if (cur === 'THB') return Math.round(n * thb);
+  return Math.round(n);
+}
+function colProjectFormatRateDate(iso) {
+  const s = String(iso || '').trim();
+  if (!s) return '...';
+  const p = s.split('-');
+  if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+  return s;
+}
+function colProjectRemarkText(cp, calc, rowKind) {
+  const parts = [];
+  if (cp.rate_date) parts.push(colProjectFormatRateDate(cp.rate_date));
+  parts.push(`ກຳນົດອັດຕາແລກປ່ຽນ ${fmtN(cp.usd_rate || 0)} ກີບ/ໂດລາ`);
+  parts.push(`${cp.thb_rate || 0} ກີບ/ບາດ`);
+  if (cp.remark_extra) parts.push(String(cp.remark_extra).trim());
+  if (rowKind === 'net' && cp.currency !== 'LAK') {
+    const netLak = colProjectToLAK(calc.netAvailable, cp.currency, cp);
+    parts.push(`≈ ${fmtN(netLak)} ກີບ`);
+  }
+  return parts.filter(Boolean).join(' · ');
+}
+function onColValuationModeChanged() {
+  const mode = getColValuationMode();
+  const hid = document.getElementById('col_valuation_mode');
+  if (hid) hid.value = mode;
+  const isProj = mode === 'project';
+  ['col_standard_wrap', 'col_standard_summary_wrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isProj ? 'none' : '';
+  });
+  ['col_project_panel', 'col_project_summary_wrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isProj ? '' : 'none';
+  });
+  if (isProj) {
+    colProjectPrefillRates();
+    const cpTb = document.getElementById('col_project_body');
+    if (cpTb && !cpTb.rows.length) initColProjectBody();
+    calcColProjectTotals();
+  } else if (typeof calcColTotals === 'function') {
+    calcColTotals();
+  }
+  if (typeof autoFillColTemplateText === 'function') autoFillColTemplateText(false);
+}
+function calcColProjectTotals() {
+  if (getColValuationMode() !== 'project') return;
+  const cp = readColProjectFromDOM();
+  const calc = calcColProjectFromData(cp);
+  const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.value = val; };
+  setEl('col_proj_gross', calc.gross.toLocaleString());
+  setEl('col_proj_max_guarantee', calc.maxGuarantee.toLocaleString());
+  setEl('col_proj_net_available', calc.netAvailable.toLocaleString());
+  const netLak = colProjectToLAK(calc.netAvailable, cp.currency, cp);
+  const grossLak = colProjectToLAK(calc.gross, cp.currency, cp);
+  setEl('col_total', netLak.toLocaleString());
+  setEl('col_grand_gross', grossLak.toLocaleString());
+  let loan = typeof approveTranchesLAKSum === 'function' ? approveTranchesLAKSum() : 0;
+  if (!loan) loan = parseFloat(document.getElementById('ap_amount')?.value) || parseFloat(document.getElementById('f_amount')?.value) || 0;
+  const ratio = netLak > 0 ? loan / netLak * 100 : 0;
+  setEl('col_loan_ratio', netLak > 0 ? ratio.toFixed(2) + '%' : '—');
+  const status = document.getElementById('col_status');
+  if (status) {
+    if (netLak === 0) status.innerHTML = '';
+    else if (ratio <= 70) {
+      status.style.background = '#d4edda'; status.style.color = '#155724';
+      status.innerHTML = `✅ ຫຼັກຊັບພຽງພໍ — ກູ້ ${ratio.toFixed(1)}% ຂອງເຫຼືອຄ້ຳໄດ້ (≤ 70%)`;
+    } else {
+      status.style.background = '#f8d7da'; status.style.color = '#721c24';
+      status.innerHTML = `⚠️ ຫຼັກຊັບບໍ່ພຽງພໍ — ກູ້ ${ratio.toFixed(1)}% (ຄວນ ≤ 70%)`;
+    }
+  }
+  if (typeof autoFillColTemplateText === 'function') autoFillColTemplateText(false);
+}
+function apbProjectCollateralDocHTML(D) {
+  const cp = getColProjectFromD(D);
+  const calc = calcColProjectFromData(cp);
+  const fmt = n => fmtN(Math.round(parseColKip(n)) || 0);
+  const cur = cp.currency || 'LAK';
+  const valHdr = colProjectCurrencyHdr(cur);
+  const priorCnt = String(cp.prior_contracts || '').trim() || '...';
+  const remarkHtml = colProjectRemarkText(cp, calc, 'net')
+    .split(' · ').map(s => escapeHtml(s.trim())).filter(Boolean).join('<br>');
+  const lblRight = 'text-align:right';
+  const itemRows = (calc.ltvRows && calc.ltvRows.length) ? calc.ltvRows : colProjectNormalizeItems(cp);
+  const rows = [];
+  itemRows.forEach((it, i) => {
+    rows.push([String(i + 1), it.item || '', it.value, '']);
+  });
+  rows.push(['', 'ລວມມູນຄ່າຫຼັກຊັບທັງໝົດ', calc.gross, lblRight]);
+  itemRows.forEach(it => {
+    const lab = String(it.item || '').trim();
+    const pct = parseColKip(it.ltv_pct) || 50;
+    const ltvLab = lab
+      ? `ຫຼັກຊັບປະເພດ${lab}ສາມາດຄ້ຳປະກັນໄດ້ຈຳນວນ ${pct}%`
+      : `ສາມາດຄ້ຳປະກັນໄດ້ຈຳນວນ ${pct}%`;
+    rows.push(['', ltvLab, it.ltvVal != null ? it.ltvVal : Math.round(parseColKip(it.value) * pct / 100), lblRight]);
+  });
+  rows.push(['', 'ລວມມູນຄ່າຫຼັກຊັບທີ່ສາມາດຄ້ຳປະກັນໄດ້ສູງສຸດ', calc.maxGuarantee, lblRight]);
+  rows.push(['', `ໄດ້ຄ້ຳປະກັນເງິນກູ້ ກັບ ທສກ ກ່ອນໜ້ານີ້ ${priorCnt} ສັນຍາ`, cp.prior_guaranteed, lblRight]);
+  rows.push(['', 'ສາມາດຄ້ຳປະກັນໄດ້ສູງສຸດ', calc.netAvailable, lblRight]);
+  const totalRows = rows.length;
+  let body = '';
+  rows.forEach((r, i) => {
+    const no = r[0], label = r[1], val = r[2], lblStyle = r[3];
+    body += '<tr>';
+    body += `<td class="c-fit" style="text-align:center">${no || ''}</td>`;
+    body += `<td class="c-text"${lblStyle ? ` style="${lblStyle}"` : ''}>${escapeHtml(label)}</td>`;
+    body += `<td class="c-num">${fmt(val)}</td>`;
+    if (i === 0) {
+      body += `<td rowspan="${totalRows}" class="c-text apb-proj-remark" style="font-size:9pt">${remarkHtml || '&nbsp;'}</td>`;
+    }
+    body += '</tr>';
+  });
+  return `<table class="apb-data-tbl apb-bw-tbl apb-auto-fit-tbl apb-col-fit-tbl apb-proj-col-tbl tight-num" style="margin-top:4px"
+    data-min-cols="${JSON.stringify([28, 180, 100, 120])}">
+<colgroup><col style="width:28px"><col><col style="width:100px"><col style="width:120px"></colgroup>
+<thead><tr>
+  <th class="c-fit">ລ/ດ</th>
+  <th class="c-text">ເນື້ອໃນລາຍການຫຼັກຊັບ</th>
+  <th class="c-num">${escapeHtml(valHdr)}</th>
+  <th class="c-text">ໝາຍເຫດ</th>
+</tr></thead>
+<tbody>${body}</tbody>
+</table>`;
+}
+function buildColProjectTemplate(D) {
+  const cp = getColProjectFromD(D);
+  const calc = calcColProjectFromData(cp);
+  const ref = (D.col_ref || '...').trim();
+  const dt = (D.col_date || '...').trim();
+  const curLab = colProjectCurrencyLabel(cp.currency || 'LAK');
+  const grossStr = fmtN(calc.gross) + ' ' + curLab;
+  const netStr = fmtN(calc.netAvailable) + ' ' + curLab;
+  const netLak = colProjectToLAK(calc.netAvailable, cp.currency, cp);
+  const netLakStr = fmtN(netLak) + ' ກີບ';
+  const appr = fmtN(parseN((D.ap_amount || D.amount || 0))) + ' ' + (D.ap_currency || D.currency || 'ກີບ');
+  let priorNote = '';
+  if (parseColKip(cp.prior_guaranteed) > 0) {
+    priorNote = ` ຫັກຄ້ຳປະກັນເກົ່າກັບ ທສກ ${String(cp.prior_contracts || '').trim() || '...'} ສັນຍາ ແລ້ວເຫຼືອຄ້ຳໄດ້ ${netStr}`;
+    if (cp.currency !== 'LAK') priorNote += ` (≈ ${netLakStr})`;
+  }
+  const ltvNote = (calc.ltvRows || []).map(it => `${parseColKip(it.ltv_pct) || 50}%`).join(' · ') || '—';
+  return `ການວິເຄາະຫຼັກຊັບຄ້ຳປະກັນແບບໂຄງການ ອີງຕາມໜັງສືລາຍງານຮັບຮອງມູນຄ່າຫຼັກຊັບຄ້ຳປະກັນ ສະບັບເລກທີ ${ref}, ລົງວັນທີ ${dt}, ສະແດງໃຫ້ເຫັນວ່າ ມູນຄ່າຫຼັກຊັບຮັບຮອງລວມ ${grossStr} (${(calc.ltvRows || []).length} ລາຍການ · LTV ${ltvNote}), ຄ້ຳປະກັນສູງສຸດ ${fmtN(calc.maxGuarantee)} ${curLab}.${priorNote} ມູນຄ່າດັ່ງກ່າວພຽງພໍຄ້ຳປະກັນວົງເງິນສິນເຊື່ອ ${appr} ຕາມລະບຽບ ທສກ.`;
+}
+
 function colCrossUSD(lak, kipPerUsd) {
   const d = parseFloat(kipPerUsd) || 1;
   return (lak / d).toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -6004,12 +6425,30 @@ function autoFillColTemplateText(force) {
   if (!el) return;
   if (!force && el.dataset.manual === '1') return;
   const D = typeof collectAllData === 'function' ? collectAllData() : {};
-  el.value = buildColResearchTemplate(D);
+  const isProj = (D.col_valuation_mode || getColValuationMode()) === 'project';
+  el.value = isProj ? buildColProjectTemplate(D) : buildColResearchTemplate(D);
   if (force) delete el.dataset.manual;
   onResSectionDisplayChanged();
 }
 function apbCollateralValuationDocHTML(D) {
+  const valMode = D.col_valuation_mode || 'standard';
   const mode = D.col_display_mode || 'text';
+  if (valMode === 'project') {
+    if (mode === 'text') {
+      let t = String(D.col_display_text || '').trim();
+      if (!t) t = buildColProjectTemplate(D);
+      if (!t) return '<p style="text-indent:40px;color:#999;margin:6px 0">(ບໍ່ໄດ້ປ້ອນ)</p>';
+      const body = finishNarrativeWithApx(t, D, 'col');
+      return `<p style="text-indent:40px;text-align:justify;margin:6px 0;white-space:pre-wrap">${escapeHtml(body)}</p>`;
+    }
+    if (mode === 'separate_doc') {
+      const ref = escapeHtml(D.col_ref || '...');
+      const dt = escapeHtml(D.col_date || '...');
+      const body = finishNarrativeWithApx(`ຫຼັກຊັບຄ້ຳປະກັນແບບໂຄງການມີໜັງສືຮັບຮອງມູນຄ່າຫຼັກຊັບ ເລກທີ ${ref} ລົງວັນທີ ${dt} ແຍກຕ່າງຫາກ`, D, 'col');
+      return `<p style="text-indent:40px;text-align:justify;margin:6px 0">${body}</p>`;
+    }
+    return apbProjectCollateralDocHTML(D);
+  }
   if (mode === 'text') {
     let t = String(D.col_display_text || '').trim();
     if (!t) t = buildColResearchTemplate(D);
@@ -6204,6 +6643,7 @@ function colTypeChanged(sel) {
 }
 
 function calcColTotals() {
+  if (typeof getColValuationMode === 'function' && getColValuationMode() === 'project') return;
   var land=0,res=0,bldRes=0,bldCom=0,off=0,depLak=0,depFx=0,cashCheque=0,veh=0,proj=0,recv=0;
   var landM=0,resM=0,bldResM=0,bldComM=0,offM=0,depLakM=0,depFxM=0,cashChequeM=0,vehM=0,projM=0,recvM=0;
   document.querySelectorAll('#col_body tr').forEach(tr => {
@@ -8087,6 +8527,13 @@ function collectAllData() {
     res_dscr_narrative: g('res_dscr_narrative'),
     col_display_mode: g('col_display_mode') || 'text',
     col_display_text: g('col_display_text'),
+    col_valuation_mode: document.querySelector('input[name="col_valuation_mode"]:checked')?.value || g('col_valuation_mode') || 'standard',
+    colProject: (function() {
+      const vm = document.querySelector('input[name="col_valuation_mode"]:checked')?.value || g('col_valuation_mode') || 'standard';
+      if (vm !== 'project') return null;
+      const cp = typeof readColProjectFromDOM === 'function' ? readColProjectFromDOM() : {};
+      return Object.assign({}, cp, typeof calcColProjectFromData === 'function' ? calcColProjectFromData(cp) : {});
+    })(),
     // Approval
     ap_amount: gn('ap_amount'), ap_amount_text: g('ap_amount_text'), ap_currency: g('ap_currency'),
     approve_tranches: Array.from(document.querySelectorAll('#approve_tranches_body tr')).map((tr, i) => {
@@ -8659,6 +9106,7 @@ function buildCapacityNarrativeFromData(D) {
   return finishNarrativeWithApx(parts.join(' '), D, ['pl', 'dscr']);
 }
 function buildColResearchTemplate(D) {
+  if ((D.col_valuation_mode || 'standard') === 'project') return buildColProjectTemplate(D);
   const ref = (D.col_ref || '...').trim();
   const dt = (D.col_date || '...').trim();
   const gross = fmtN(parseColKip(D.col_grand_gross));
@@ -18449,11 +18897,18 @@ function saveFormJSON() {
     else data[el.id] = el.value;
   });
   // All dynamic tables
-  ['cib_body','dep_body','usage_body','s_guarantors_body','research_signers_body','col_body','repay_body','proposal_tranches_body','approve_tranches_body','withdraw_draws_body','withdraw_long_signers_body','vote_ballot_members_body'].forEach(id => {
+  ['cib_body','dep_body','usage_body','s_guarantors_body','research_signers_body','col_body','col_project_body','repay_body','proposal_tranches_body','approve_tranches_body','withdraw_draws_body','withdraw_long_signers_body','vote_ballot_members_body'].forEach(id => {
     const tbody = document.getElementById(id);
     if (!tbody) return;
     const rows = [];
     tbody.querySelectorAll('tr').forEach(tr => {
+      if (id === 'col_project_body') {
+        const itemIn = tr.querySelector('.col-proj-item');
+        const valIn = tr.querySelector('.col-proj-val');
+        const ltvIn = tr.querySelector('.col-proj-ltv');
+        if (itemIn || valIn) rows.push([itemIn?.value || '', valIn?.value || '', ltvIn?.value || '']);
+        return;
+      }
       const row = [];
       tr.querySelectorAll('input,select').forEach(i => row.push(i.value));
       rows.push(row);
@@ -18542,6 +18997,10 @@ function loadFormJSON(event) {
         const cr = document.querySelector(`input[name="col_display_mode"][value="${data.col_display_mode}"]`);
         if (cr) cr.checked = true;
       }
+      if (data.col_valuation_mode) {
+        const vr = document.querySelector(`input[name="col_valuation_mode"][value="${data.col_valuation_mode}"]`);
+        if (vr) vr.checked = true;
+      }
       const colTextEl = document.getElementById('col_display_text');
       if (colTextEl) {
         const savedText = String(data.col_display_text || '').trim();
@@ -18553,6 +19012,7 @@ function loadFormJSON(event) {
         }
       }
       if (typeof onColDisplayModeChanged === 'function') onColDisplayModeChanged();
+      if (typeof onColValuationModeChanged === 'function') onColValuationModeChanged();
       ['res_cib_display', 'res_dep_display', 'res_usage_display'].forEach(name => {
         if (data[name]) {
           const r = document.querySelector(`input[name="${name}"][value="${data[name]}"]`);
@@ -18643,6 +19103,7 @@ function loadFormJSON(event) {
           for (let i = rows.length; i < all.length; i++) all[i].remove();
         } catch(ex) { console.error(id, ex); }
       });
+      if (typeof restoreColProjectBodyFromData === 'function') restoreColProjectBodyFromData(data);
       if (typeof updateWithdrawDrawCurrencyLabel === 'function') updateWithdrawDrawCurrencyLabel();
       document.querySelectorAll('#proposal_tranches_body tr').forEach(tr => {
         const amt = tr.querySelector('#f_amount, .ptr-amt');
@@ -18699,7 +19160,8 @@ function loadFormJSON(event) {
       if (typeof syncLegacyWithdrawFieldsFromTable === 'function') syncLegacyWithdrawFieldsFromTable();
       if (typeof updateWithdrawDrawCurrencyLabel === 'function') updateWithdrawDrawCurrencyLabel();
       if (typeof calcApprFees==='function') calcApprFees();
-      if (typeof calcColTotals==='function') calcColTotals();
+      if (typeof onColValuationModeChanged === 'function') onColValuationModeChanged();
+      else if (typeof calcColTotals==='function') calcColTotals();
       if (typeof onMinutesEquivToggle === 'function') onMinutesEquivToggle();
       if (typeof syncMinutesPastLoanCheckboxFromLegacy === 'function') syncMinutesPastLoanCheckboxFromLegacy();
       if (typeof onMinutesPastLoanToggle === 'function') onMinutesPastLoanToggle();
