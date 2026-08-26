@@ -1495,7 +1495,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
             <tr>
               <td style="text-align:center;font-weight:700;color:#555">1</td>
               <td><select id="ap_currency" onchange="calcApprFees();rebuildRepay();if(typeof calcCIBTotals==='function')calcCIBTotals();if(typeof updateWithdrawDrawCurrencyLabel==='function')updateWithdrawDrawCurrencyLabel();"><option value="ກີບ" selected>ກີບ (LAK)</option><option value="ໂດລາ">ໂດລາ (USD)</option><option value="ບາດ">ບາດ (THB)</option></select></td>
-              <td><input type="number" id="ap_amount" value="5000000000" class="mono" oninput="updateAmountText('ap_amount','ap_amount_text');calcApprFees();rebuildRepay()"></td>
+              <td><input type="number" id="ap_amount" value="5000000000" class="mono" oninput="updateAmountText('ap_amount','ap_amount_text');calcApprFees();rebuildRepay();syncTechVerdictForOver5B()"></td>
               <td><input type="number" id="ap_rate" value="13.5" step="0.1" class="mono"></td>
               <td><input type="text" id="ap_amount_text" value="ຫ້າຕື້" readonly class="mono"></td>
               <td><input type="number" id="ap_term" value="72" class="mono apr-term" oninput="rebuildRepay()"></td>
@@ -4409,7 +4409,7 @@ function delTrancheRow(tbodyId, btn) {
   if (tb.rows.length <= 1) { showToast('⚠️ ຕ້ອງມີຢ່າງໜ້ອຍ 1 ແຖວ'); return; }
   btn.closest('tr').remove();
   renumberRows(tbodyId);
-  if (tbodyId === 'approve_tranches_body') { calcApprFees(); rebuildRepay(); }
+  if (tbodyId === 'approve_tranches_body') { calcApprFees(); rebuildRepay(); syncTechVerdictForOver5B(); }
 }
 function addProposalTrancheRow() {
   const body = document.getElementById('proposal_tranches_body');
@@ -4477,6 +4477,7 @@ function addApproveTrancheRow() {
     <td><button type="button" class="del-btn" onclick="delTrancheRow('approve_tranches_body',this)">✕</button></td>`;
   body.appendChild(tr);
   renumberRows('approve_tranches_body');
+  syncTechVerdictForOver5B();
 }
 function syncAprTrancheAmt(inp) {
   const tr = inp && inp.closest('tr');
@@ -4484,6 +4485,24 @@ function syncAprTrancheAmt(inp) {
   syncTrancheAmountWords(inp, tr.querySelector('.apr-txt'));
   calcApprFees();
   rebuildRepay();
+  syncTechVerdictForOver5B();
+}
+/** ວົງເງິນອະນຸມັດ > 5 ຕື້ → ເລືອກ «ບໍ່ສາມາດຕັດສິນໃຈ» ໃນ XII ແລະ XIII ອັດຕະໂນມັດ */
+function syncTechVerdictForOver5B() {
+  const rows = [];
+  document.querySelectorAll('#approve_tranches_body tr').forEach((tr, i) => {
+    const amtIn = i === 0 ? document.getElementById('ap_amount') : tr.querySelector('.apr-amt');
+    const n = parseN(amtIn?.value);
+    if (n > 0) rows.push({ amount: n });
+  });
+  const over5B = rows.length
+    ? rows.some(r => parseN(r.amount) > 5000000000)
+    : parseN(document.getElementById('ap_amount')?.value) > 5000000000;
+  if (!over5B) return;
+  const techSel = document.getElementById('tech_verdict');
+  const tskSel = document.getElementById('tsk_verdict');
+  if (techSel) techSel.value = 'ບໍ່ສາມາດຕັດສິນໃຈ';
+  if (tskSel) tskSel.value = 'ບໍ່ສາມາດຕັດສິນໃຈ';
 }
 function approveTranchesLAKSum() {
   let sumLak = 0;
@@ -9576,6 +9595,14 @@ function getApproveTranchesForRender(D) {
   }];
 }
 
+/** ວົງເງິນອະນຸມັດເກີນ 5 ຕື້ (logic ດຽວກັບໜັງສືແຈ້ງຜົນ) */
+function isApprovalOver5B(D) {
+  const rows = getApproveTranchesForRender(D);
+  return rows.length
+    ? rows.some(r => parseN(r.amount) > 5000000000)
+    : parseN(D.ap_amount) > 5000000000;
+}
+
 /** ຈຳນວນຄ່າທຳນຽມສະແດງຕາມສະກຸນ (ກີບ = ຈຳນວນເຕັມ; FX = ທົດສະນິຍົມ 2 ຕຳແໜ່ງ) */
 function fmtFeeByCurrency(v, ccy) {
   const c = String(ccy || 'ກີບ').trim();
@@ -11003,9 +11030,10 @@ function renderResearch(D, variant) {
 
   if (isChair) {
     // ── ຂໍ້ຄວາມປິດທ້າຍ: ຢູ່ລຸ່ມຕາຕະລາງງວດຊຳລະ, ດຶງ ວົງເງິນ/ດອກເບ້ຍ/ໄລຍະ ຈາກ footer ──
-    const _isVip = (typeof currentDoc !== 'undefined' && currentDoc === 'chairman_vip');
     const _apr = getApproveTranchesForRender(D);
     const _bizStr = escapeHtml(D.biz_name || '..............');
+    const _over5BChair = isApprovalOver5B(D);
+    const _cannotDecideChair = (D.tsk_verdict || '') === 'ບໍ່ສາມາດຕັດສິນໃຈ';
     // ວົງເງິນ/ດອກເບ້ຍ/ໄລຍະ ໃນວັກປິດທ້າຍ — ຮອງຮັບ 1 ສະກຸນ ຫຼື ຫຼາຍສະກຸນ (ລວມໃນວັກດຽວ)
     let _loanDetail;
     if (_apr.length > 1) {
@@ -11022,15 +11050,20 @@ function renderResearch(D, variant) {
                   + ', ອັດຕາດອກເບ້ຍ ' + fmtRatePct(_r0.rate || D.ap_rate) + '% ຕໍ່ປີ,'
                   + ' ໄລຍະເວລາ ' + (_r0.term || D.ap_term || '-') + ' ເດືອນ ';
     }
-    // VIP: ຂໍທິດຊີ້ນຳ (ເກີນສິດ ຄະນະ ຜອ.) ກ່ອນ ແລ້ວຈຶ່ງຮຽນລາຍງານ
-    if (_isVip) {
-      h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px;font-weight:700">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວນີ້ແລ້ວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງຄະນະ ຜອ. ສະນັ້ນ, ຈຶ່ງຮຽນສະເໜີຂໍທິດຊີ້ນໍາຈາກທ່ານປະທານ ເພື່ອຄົ້ນຄວ້າ ແລະ ພິຈາລະນາ. ໃນກໍລະນີທີ່ທ່ານຫາກເຫັນດີຕາມການສະເໜີຂອງລູກຄ້າ ແມ່ນຂໍໃຫ້ທ່ານຊ່ວຍລົງລາຍເຊັນເພື່ອອະນຸມັດ, ໃນກໍລະນີທີ່ທ່ານຫາກບໍ່ເຫັນດີແມ່ນກະລຸນາສົ່ງສໍານວນເອກະສານກັບຄືນ ແລະ ມີທິດຊີ້ນໍາເພີ່ມຕື່ມເພື່ອເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປດ້ວຍ.</p>`;
+    // > 5 ຕື້ + ບໍ່ສາມາດຕັດສິນໃຈ: ຂໍທິດຊີ້ນຳຈາກປະທານ (ທັງ chairman ແລະ chairman_vip)
+    if (_over5BChair && _cannotDecideChair) {
+      h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px;font-weight:700">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງຄະນະ ຜອ. ສະນັ້ນ, ຈຶ່ງຮຽນສະເໜີຂໍທິດຊີ້ນໍາຈາກທ່ານປະທານ ເພື່ອຄົ້ນຄວ້າ ແລະ ພິຈາລະນາ. ໃນກໍລະນີທີ່ທ່ານຫາກເຫັນດີຕາມການສະເໜີຂອງລູກຄ້າ ແມ່ນຂໍໃຫ້ທ່ານຊ່ວຍລົງລາຍເຊັນເພື່ອອະນຸມັດ, ໃນກໍລະນີທີ່ທ່ານຫາກບໍ່ເຫັນດີແມ່ນກະລຸນາສົ່ງສໍານວນເອກະສານກັບຄືນ ແລະ ມີທິດຊີ້ນໍາເພີ່ມຕື່ມເພື່ອເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປດ້ວຍ.</p>`;
     }
     // ຂໍ້ຄວາມຮຽນລາຍງານ (ທັງ ທົ່ວໄປ ແລະ VIP) — ພ້ອມ ຊື່ບໍລິສັດ/ວົງເງິນ/ດອກເບ້ຍ/ໄລຍະ
     h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px">ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ປະທານສະພາບໍລິຫານ ເພື່ອພິຈາລະນາ ແລະ ອະນຸມັດ ຕໍ່ກັບການສະເໜີກູ້ຢືມຂອງ ${_bizStr} ${_loanDetail}ຕາມເຫັນສົມຄວນດ້ວຍ.</p>`;
     h += buildChairmanSignoffBlock();
   } else {
+    const _over5B = isApprovalOver5B(D);
+    const _cannotDecide = (D.tech_verdict || '') === 'ບໍ່ສາມາດຕັດສິນໃຈ';
     h += `<div class="signature-section">`;
+    if (_over5B && _cannotDecide) {
+      h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px;font-weight:700">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງພະແນກສິນເຊື່ອ ແລະ ຄະນະຜູ້ອຳນວຍການ. ສະນັ້ນ, ທສກ ຈຶ່ງຂໍສ້າງໜັງສືລາຍງານອີກໜຶ່ງສະບັບ ເພື່ອຮຽນສະເໜີຂໍທິດຊີ້ນຳຈາກສະພາບໍລິຫານ ໃຫ້ເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປ</p>`;
+    }
     h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px">ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ເພື່ອພິຈາລະນາ ແລະ ມີຄຳເຫັນເປັນທິດຊີ້ນຳຕາມເຫັນສົມຄວນ.</p>`;
     h += `<div style="text-align:right;margin:8px 40px 4px">ດ້ວຍຄວາມນັບຖືຢ່າງສູງ</div>`;
     h += `<div style="text-align:right;margin:0 40px calc(30px + 2em);font-weight:700">ວິຊາການຜູ້ຄົ້ນຄວ້າ</div>`;
@@ -19408,6 +19441,7 @@ function loadFormJSON(event) {
       if (typeof syncLegacyWithdrawFieldsFromTable === 'function') syncLegacyWithdrawFieldsFromTable();
       if (typeof updateWithdrawDrawCurrencyLabel === 'function') updateWithdrawDrawCurrencyLabel();
       if (typeof calcApprFees==='function') calcApprFees();
+      if (typeof syncTechVerdictForOver5B === 'function') syncTechVerdictForOver5B();
       if (typeof onColValuationModeChanged === 'function') onColValuationModeChanged();
       else if (typeof calcColTotals==='function') calcColTotals();
       if (typeof onMinutesEquivToggle === 'function') onMinutesEquivToggle();
