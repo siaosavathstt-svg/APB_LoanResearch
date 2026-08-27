@@ -1454,6 +1454,25 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
         <textarea id="tsk_opinion" rows="6" placeholder="ຖ້າປ່ອຍວ່າງ ລະບົບຈະລິ້ງຈາກທັດສະນະວິຊາການໃຫ້"></textarea>
       </div>
 
+      <div class="sec-lbl-sub" style="margin-top:14px">📄 ຂໍ້ຄວາມປິດທ້າຍ (> 5 ຕື້ · ບໍ່ສາມາດຕັດສິນໃຈ)</div>
+      <div class="info-note" style="margin-bottom:10px">ℹ️ ສະແດງອັດຕະໂນມັດເມື່ອວົງເງິນອະນຸມັດ &gt; 5 ຕື້ ແລະ verdict = «ບໍ່ສາມາດຕັດສິນໃຈ». ຫຼື ເລືອກບັງຄັບສະແດງເຖິງວົງເງິນບໍ່ເຖິງ 5 ຕື້.</div>
+      <div class="field">
+        <label>ບົດຄົ້ນຄວ້າ — ຍ່າງ bold ກ່ອນ «ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານ...»</label>
+        <textarea id="research_over5b_close" rows="4" style="width:100%">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງພະແນກສິນເຊື່ອ ແລະ ຄະນະຜູ້ອຳນວຍການ. ສະນັ້ນ, ທສກ ຈຶ່ງຂໍສ້າງໜັງສືລາຍງານອີກໜຶ່ງສະບັບ ເພື່ອຮຽນສະເໜີຂໍທິດຊີ້ນຳຈາກສະພາບໍລິຫານ ໃຫ້ເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປ</textarea>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px">
+          <input type="checkbox" id="research_force_over5b_close" onchange="if(typeof generateDoc==='function'&&['research','chairman','chairman_vip'].includes(currentDoc))generateDoc()">
+          <span><strong>ບັງຄັບສະແດງ</strong> — ສະແດງຂໍ້ຄວາມນີ້ໃນບົດຄົ້ນຄວ້າ ເຖິງວົງເງິນບໍ່ເຖິງ 5 ຕື້</span>
+        </label>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label>ໜັງສືລາຍງານປະທານ — ຍ່າງ bold ກ່ອນ «ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານ...»</label>
+        <textarea id="chair_over5b_close" rows="5" style="width:100%">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງຄະນະ ຜອ. ສະນັ້ນ, ຈຶ່ງຮຽນສະເໜີຂໍທິດຊີ້ນໍາຈາກທ່ານປະທານ ເພື່ອຄົ້ນຄວ້າ ແລະ ພິຈາລະນາ. ໃນກໍລະນີທີ່ທ່ານຫາກເຫັນດີຕາມການສະເໜີຂອງລູກຄ້າ ແມ່ນຂໍໃຫ້ທ່ານຊ່ວຍລົງລາຍເຊັນເພື່ອອະນຸມັດ, ໃນກໍລະນີທີ່ທ່ານຫາກບໍ່ເຫັນດີແມ່ນກະລຸນາສົ່ງສໍານວນເອກະສານກັບຄືນ ແລະ ມີທິດຊີ້ນໍາເພີ່ມຕື່ມເພື່ອເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປດ້ວຍ.</textarea>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px">
+          <input type="checkbox" id="chair_force_over5b_close" onchange="if(typeof generateDoc==='function'&&['research','chairman','chairman_vip'].includes(currentDoc))generateDoc()">
+          <span><strong>ບັງຄັບສະແດງ</strong> — ສະແດງຂໍ້ຄວາມນີ້ໃນໜັງສືປະທານ ເຖິງວົງເງິນບໍ່ເຖິງ 5 ຕື້</span>
+        </label>
+      </div>
+
       <div class="sec-lbl-sub" style="margin-top:14px">📋 ເງື່ອນໄຂການໃຫ້ກູ້ຢືມ</div>
       <div class="field">
         <label>ເງື່ອນໄຂທາງການທີ່ຈະລະບຸໃນບົດຄົ້ນຄວ້າ</label>
@@ -1509,6 +1528,19 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
         </table>
       </div>
       <button type="button" class="add-row-btn" onclick="addApproveTrancheRow()" style="margin-bottom:14px;width:auto;display:inline-flex">+ ເພີ່ມແຖວອະນຸມັດ</button>
+
+      <div class="sec-lbl-sub" style="margin-top:14px">📊 ອັດຕາດອກເບ້ຍໃນເອກະສານອະນຸມັດ</div>
+      <div class="info-note" style="margin-bottom:10px">ℹ️ ຖ້າບໍ່ເລືອກເກຣດ ແລະ ບໍ່ພິມຂໍ້ຄວາມເພີ່ມ — ສະແດງ «ອັດຕາດອກເບ້ຍ: X% ຕໍ່ປີ» ແບບເກົ່າ. ຂໍ້ຄວາມຫຼັງ «ຕໍ່ປີ» ພິມຫຍັງກໍໄດ້ (ລະບົບບໍ່ໃສ່ + ໃຫ້).</div>
+      <div class="grid g2">
+        <div class="field">
+          <label>ເກຣດອັດຕາດອກເບ້ຍ (ຖ້າວ່າງ = ແບບເກົ່າ)</label>
+          <input type="text" id="ap_rate_grade" placeholder="ຕົວຢ່າງ: AA" style="max-width:140px">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>ຂໍ້ຄວາມຕໍ່ຈາກ «ຕໍ່ປີ» (ຖ້າວ່າງ = ແບບເກົ່າ)</label>
+          <input type="text" id="ap_rate_suffix" placeholder="+ ອັດຕາດອກເບ້ຍການຄໍ້າປະກັນສິນເຊື່ອ ບຄຊ (ທີ່ບໍ່ມີຫຼັກຊັບ): 1.50% ຕໍ່ປີ" style="width:100%">
+        </div>
+      </div>
 
       <div class="sec-lbl-sub">💰 ຂໍ້ມູນອື່ນໆ</div>
       <div class="grid g3">
@@ -4920,6 +4952,26 @@ function fmtRatePct(v) {
   const n = parseFloat(s.replace(/,/g, ''));
   if (!Number.isFinite(n)) return s;
   return n.toFixed(2);
+}
+
+/** ອັດຕາດອກເບ້ຍອະນຸມັດ — label/value ຕາມ ap_rate_grade ແລະ ap_rate_suffix (ວ່າງ = ແບບເກົ່າ) */
+function apprRateLabelText(D) {
+  const grade = String(D.ap_rate_grade || '').trim();
+  return grade ? 'ອັດຕາດອກເບ້ຍ (' + grade + ')' : 'ອັດຕາດອກເບ້ຍ';
+}
+function apprRateLabel(D) {
+  const grade = String(D.ap_rate_grade || '').trim();
+  return grade ? 'ອັດຕາດອກເບ້ຍ (' + escapeHtml(grade) + ')' : 'ອັດຕາດອກເບ້ຍ';
+}
+function apprRateValueText(D, rate) {
+  const r = rate != null && rate !== '' ? rate : D.ap_rate;
+  let val = fmtRatePct(r) + '% ຕໍ່ປີ';
+  const suffix = String(D.ap_rate_suffix || '').trim();
+  if (suffix) val += ' ' + suffix;
+  return val;
+}
+function apprRateValue(D, rate) {
+  return escapeHtmlLaoJustify(apprRateValueText(D, rate));
 }
 
 /** ── Appendix display settings (portrait / per-currency million) ── */
@@ -8743,6 +8795,10 @@ function collectAllData() {
     analysis_4p_promotion: g('analysis_4p_promotion'),
     // Opinion
     tech_verdict: g('tech_verdict'), tech_opinion: g('tech_opinion'), tsk_verdict: g('tsk_verdict'), tsk_opinion: g('tsk_opinion'), loan_conditions: g('loan_conditions'),
+    research_over5b_close: g('research_over5b_close'),
+    chair_over5b_close: g('chair_over5b_close'),
+    research_force_over5b_close: !!document.getElementById('research_force_over5b_close')?.checked,
+    chair_force_over5b_close: !!document.getElementById('chair_force_over5b_close')?.checked,
     res_show_conditions: !!document.getElementById('res_show_conditions')?.checked,
     res_show_swot: !!document.getElementById('res_show_swot')?.checked,
     res_show_4p: !!document.getElementById('res_show_4p')?.checked,
@@ -8796,6 +8852,7 @@ function collectAllData() {
       };
     }),
     ap_purpose: g('ap_purpose'), ap_usage: g('ap_usage'), ap_term: g('ap_term'), ap_rate: g('ap_rate'),
+    ap_rate_grade: g('ap_rate_grade'), ap_rate_suffix: g('ap_rate_suffix'),
     ap_repay_display: g('ap_repay_display') || 'detail',
     ap_int_method: g('ap_int_method'), ap_fund_src: g('ap_fund_src'), ap_expiry: gd('ap_expiry'),
     fee_approve: g('fee_approve'), fee_approve_pct: g('fee_approve_pct'),
@@ -9603,6 +9660,29 @@ function isApprovalOver5B(D) {
     : parseN(D.ap_amount) > 5000000000;
 }
 
+const DEFAULT_RESEARCH_OVER5B_CLOSE = 'ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງພະແນກສິນເຊື່ອ ແລະ ຄະນະຜູ້ອຳນວຍການ. ສະນັ້ນ, ທສກ ຈຶ່ງຂໍສ້າງໜັງສືລາຍງານອີກໜຶ່ງສະບັບ ເພື່ອຮຽນສະເໜີຂໍທິດຊີ້ນຳຈາກສະພາບໍລິຫານ ໃຫ້ເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປ';
+const DEFAULT_CHAIR_OVER5B_CLOSE = 'ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງຄະນະ ຜອ. ສະນັ້ນ, ຈຶ່ງຮຽນສະເໜີຂໍທິດຊີ້ນໍາຈາກທ່ານປະທານ ເພື່ອຄົ້ນຄວ້າ ແລະ ພິຈາລະນາ. ໃນກໍລະນີທີ່ທ່ານຫາກເຫັນດີຕາມການສະເໜີຂອງລູກຄ້າ ແມ່ນຂໍໃຫ້ທ່ານຊ່ວຍລົງລາຍເຊັນເພື່ອອະນຸມັດ, ໃນກໍລະນີທີ່ທ່ານຫາກບໍ່ເຫັນດີແມ່ນກະລຸນາສົ່ງສໍານວນເອກະສານກັບຄືນ ແລະ ມີທິດຊີ້ນໍາເພີ່ມຕື່ມເພື່ອເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປດ້ວຍ.';
+
+function getOver5BCloseText(D, kind) {
+  const key = kind === 'chair' ? 'chair_over5b_close' : 'research_over5b_close';
+  const fallback = kind === 'chair' ? DEFAULT_CHAIR_OVER5B_CLOSE : DEFAULT_RESEARCH_OVER5B_CLOSE;
+  return String(D[key] || fallback).trim();
+}
+
+function shouldShowOver5BClose(D, kind) {
+  const force = kind === 'chair' ? D.chair_force_over5b_close : D.research_force_over5b_close;
+  if (force) return true;
+  if (!isApprovalOver5B(D)) return false;
+  const verdict = kind === 'chair' ? D.tsk_verdict : D.tech_verdict;
+  return (verdict || '') === 'ບໍ່ສາມາດຕັດສິນໃຈ';
+}
+
+function renderOver5BCloseParagraph(D, kind) {
+  const txt = getOver5BCloseText(D, kind);
+  if (!txt) return '';
+  return `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px;font-weight:700">${escapeHtmlLaoJustify(txt)}</p>`;
+}
+
 /** ຈຳນວນຄ່າທຳນຽມສະແດງຕາມສະກຸນ (ກີບ = ຈຳນວນເຕັມ; FX = ທົດສະນິຍົມ 2 ຕຳແໜ່ງ) */
 function fmtFeeByCurrency(v, ccy) {
   const c = String(ccy || 'ກີບ').trim();
@@ -9785,7 +9865,7 @@ function renderApprovalByCurrencySections(D, rows, baseNo, docType) {
       '<tr><td class="dash">-</td><td class="lbl">ເປົ້າໝາຍການໃຊ້ເງິນກູ້</td><td class="colon">:</td><td class="val">' + (D.ap_purpose||'-') + '</td></tr>' +
       '<tr><td class="dash">-</td><td class="lbl">ແຜນການນຳໃຊ້</td><td class="colon">:</td><td class="val">' + (D.ap_usage||'-') + '</td></tr>' +
       '<tr><td class="dash">-</td><td class="lbl">ໄລຍະເວລາ</td><td class="colon">:</td><td class="val">' + (r.term || D.ap_term||'-') + ' ເດືອນ</td></tr>' +
-      '<tr><td class="dash">-</td><td class="lbl">ອັດຕາດອກເບ້ຍ</td><td class="colon">:</td><td class="val">' + fmtRatePct(r.rate || D.ap_rate) + '% ຕໍ່ປີ</td></tr>' +
+      '<tr><td class="dash">-</td><td class="lbl">' + apprRateLabel(D) + '</td><td class="colon">:</td><td class="val">' + apprRateValue(D, r.rate || D.ap_rate) + '</td></tr>' +
       '<tr><td class="dash">-</td><td class="lbl">ຮູບແບບສິນເຊື່ອ</td><td class="colon">:</td><td class="val">' + escapeHtml(r.loan_form || D.ap_loan_form || D.a_loan_form || 'ເປັນບ້ວງ') + '</td></tr>' +
       '<tr><td class="dash">-</td><td class="lbl">ວິທີການຊຳລະດອກເບ້ຍ</td><td class="colon">:</td><td class="val">' + escapeHtml(r.int_method || D.ap_int_method || '-') + '</td></tr>' +
       '<tr><td class="dash">-</td><td class="lbl">ແຫຼ່ງຊຳລະເງິນກູ້</td><td class="colon">:</td><td class="val">' + escapeHtml(r.repay_src || D.repay_src || 'ຈາກການດຳເນີນທຸລະກິດ') + '</td></tr>';
@@ -10196,6 +10276,11 @@ function renderResearch(D, variant) {
     h += `<p style="margin:6px 0 6px 20mm"><strong>ເລື່ອງ: ການສະເໜີຂໍສິນເຊື່ອ ຂອງ ${subjBiz}${subjOwner ? ' ' + subjOwner : ''}.</strong></p>`;
     const resNo = escapeHtml(D.a_research_no || '...');
     const resDt = escapeHtml(D.a_research_date || '...');
+    const reqRef = String(D.req_ref || '').trim();
+    const reqDt = String(D.req_date || '').trim();
+    const reqRefLine = (reqRef && reqDt)
+      ? `ອີງຕາມ ໜັງສືສະເໜີ ຂໍກູ້ຢືມເງິນ ຂອງ ${subjBiz} ສະບັບເລກທີ ${escapeHtml(reqRef)}, ລົງວັນທີ ${escapeHtml(reqDt)}.`
+      : `ອີງຕາມ ໜັງສືສະເໜີ ຂໍກູ້ຢືມເງິນ ຂອງ ${subjBiz}.`;
     h += `<table style="width:calc(100% - 10mm); margin:8px 0 8px 10mm; border-collapse:collapse;">
     <tr>
       <td style="width:6mm; vertical-align:top; padding:0;">-</td>
@@ -10203,7 +10288,7 @@ function renderResearch(D, variant) {
     </tr>
     <tr>
       <td style="width:6mm; vertical-align:top; padding:0;">-</td>
-      <td style="vertical-align:top; padding:0;">ອີງຕາມ ໜັງສືສະເໜີ ຂໍກູ້ຢືມເງິນ ຂອງ ${subjBiz}.</td>
+      <td style="vertical-align:top; padding:0;">${reqRefLine}</td>
     </tr>
   </table>`;
     h += `<p style="text-indent:40px;text-align:justify;margin:10px 0"><strong>ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ (ທສກ)</strong> ຂໍຖືເປັນກຽດຮຽນລາຍງານມາຍັງທ່ານ ກ່ຽວກັບການສະເໜີຂໍສິນເຊື່ອ ຂອງ <strong>${subjBiz}</strong>, ລາຍລະອຽດ ດັ່ງນີ້:</p>`;
@@ -11009,7 +11094,7 @@ function renderResearch(D, variant) {
       <tr><td class="dash">-</td><td class="lbl">ເປົ້າໝາຍການໃຊ້ເງິນກູ້</td><td class="colon">:</td><td class="val">${D.ap_purpose||'-'}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ແຜນການນຳໃຊ້</td><td class="colon">:</td><td class="val">${D.ap_usage||'-'}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ໄລຍະເວລາ</td><td class="colon">:</td><td class="val">${r0.term || D.ap_term||'-'} ເດືອນ</td></tr>
-      <tr><td class="dash">-</td><td class="lbl">ອັດຕາດອກເບ້ຍ</td><td class="colon">:</td><td class="val">${fmtRatePct(r0.rate || D.ap_rate)}% ຕໍ່ປີ</td></tr>
+      <tr><td class="dash">-</td><td class="lbl">${apprRateLabel(D)}</td><td class="colon">:</td><td class="val">${apprRateValue(D, r0.rate || D.ap_rate)}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ຮູບແບບສິນເຊື່ອ</td><td class="colon">:</td><td class="val">${r0.loan_form || D.ap_loan_form || 'ເງິນກູ້ເປັນບ້ວງ'}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ວິທີການຊຳລະດອກເບ້ຍ</td><td class="colon">:</td><td class="val">${r0.int_method || D.ap_int_method||'-'}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ແຫຼ່ງຊຳລະເງິນກູ້</td><td class="colon">:</td><td class="val">${r0.repay_src || D.repay_src||'ຈາກການດຳເນີນທຸລະກິດ'}</td></tr>`;
@@ -11032,8 +11117,6 @@ function renderResearch(D, variant) {
     // ── ຂໍ້ຄວາມປິດທ້າຍ: ຢູ່ລຸ່ມຕາຕະລາງງວດຊຳລະ, ດຶງ ວົງເງິນ/ດອກເບ້ຍ/ໄລຍະ ຈາກ footer ──
     const _apr = getApproveTranchesForRender(D);
     const _bizStr = escapeHtml(D.biz_name || '..............');
-    const _over5BChair = isApprovalOver5B(D);
-    const _cannotDecideChair = (D.tsk_verdict || '') === 'ບໍ່ສາມາດຕັດສິນໃຈ';
     // ວົງເງິນ/ດອກເບ້ຍ/ໄລຍະ ໃນວັກປິດທ້າຍ — ຮອງຮັບ 1 ສະກຸນ ຫຼື ຫຼາຍສະກຸນ (ລວມໃນວັກດຽວ)
     let _loanDetail;
     if (_apr.length > 1) {
@@ -11047,22 +11130,20 @@ function renderResearch(D, variant) {
       const _amtStr = fmtN(_r0.amount || D.ap_amount) + ' ' + escapeHtml(_r0.currency || D.ap_currency || 'ກີບ');
       const _amtTxt = String(_r0.amount_text || D.ap_amount_text || '').trim();
       _loanDetail = 'ວົງເງິນ ' + _amtStr + formatAmountTextParen(_amtTxt, _r0.currency || D.ap_currency || 'ກີບ')
-                  + ', ອັດຕາດອກເບ້ຍ ' + fmtRatePct(_r0.rate || D.ap_rate) + '% ຕໍ່ປີ,'
+                  + ', ອັດຕາດອກເບ້ຍ ' + escapeHtml(apprRateValueText(D, _r0.rate || D.ap_rate)) + ','
                   + ' ໄລຍະເວລາ ' + (_r0.term || D.ap_term || '-') + ' ເດືອນ ';
     }
-    // > 5 ຕື້ + ບໍ່ສາມາດຕັດສິນໃຈ: ຂໍທິດຊີ້ນຳຈາກປະທານ (ທັງ chairman ແລະ chairman_vip)
-    if (_over5BChair && _cannotDecideChair) {
-      h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px;font-weight:700">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງຄະນະ ຜອ. ສະນັ້ນ, ຈຶ່ງຮຽນສະເໜີຂໍທິດຊີ້ນໍາຈາກທ່ານປະທານ ເພື່ອຄົ້ນຄວ້າ ແລະ ພິຈາລະນາ. ໃນກໍລະນີທີ່ທ່ານຫາກເຫັນດີຕາມການສະເໜີຂອງລູກຄ້າ ແມ່ນຂໍໃຫ້ທ່ານຊ່ວຍລົງລາຍເຊັນເພື່ອອະນຸມັດ, ໃນກໍລະນີທີ່ທ່ານຫາກບໍ່ເຫັນດີແມ່ນກະລຸນາສົ່ງສໍານວນເອກະສານກັບຄືນ ແລະ ມີທິດຊີ້ນໍາເພີ່ມຕື່ມເພື່ອເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປດ້ວຍ.</p>`;
+    // > 5 ຕື້ + ບໍ່ສາມາດຕັດສິນໃຈ (ຫຼື ບັງຄັບສະແດງ): ຂໍທິດຊີ້ນຳຈາກປະທານ
+    if (shouldShowOver5BClose(D, 'chair')) {
+      h += renderOver5BCloseParagraph(D, 'chair');
     }
     // ຂໍ້ຄວາມຮຽນລາຍງານ (ທັງ ທົ່ວໄປ ແລະ VIP) — ພ້ອມ ຊື່ບໍລິສັດ/ວົງເງິນ/ດອກເບ້ຍ/ໄລຍະ
     h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px">ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ປະທານສະພາບໍລິຫານ ເພື່ອພິຈາລະນາ ແລະ ອະນຸມັດ ຕໍ່ກັບການສະເໜີກູ້ຢືມຂອງ ${_bizStr} ${_loanDetail}ຕາມເຫັນສົມຄວນດ້ວຍ.</p>`;
     h += buildChairmanSignoffBlock();
   } else {
-    const _over5B = isApprovalOver5B(D);
-    const _cannotDecide = (D.tech_verdict || '') === 'ບໍ່ສາມາດຕັດສິນໃຈ';
     h += `<div class="signature-section">`;
-    if (_over5B && _cannotDecide) {
-      h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px;font-weight:700">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງພະແນກສິນເຊື່ອ ແລະ ຄະນະຜູ້ອຳນວຍການ. ສະນັ້ນ, ທສກ ຈຶ່ງຂໍສ້າງໜັງສືລາຍງານອີກໜຶ່ງສະບັບ ເພື່ອຮຽນສະເໜີຂໍທິດຊີ້ນຳຈາກສະພາບໍລິຫານ ໃຫ້ເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປ</p>`;
+    if (shouldShowOver5BClose(D, 'research')) {
+      h += renderOver5BCloseParagraph(D, 'research');
     }
     h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px">ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ເພື່ອພິຈາລະນາ ແລະ ມີຄຳເຫັນເປັນທິດຊີ້ນຳຕາມເຫັນສົມຄວນ.</p>`;
     h += `<div style="text-align:right;margin:8px 40px 4px">ດ້ວຍຄວາມນັບຖືຢ່າງສູງ</div>`;
@@ -11562,7 +11643,7 @@ function renderNotify(D) {
       <tr><td class="dash">-</td><td class="lbl">ເປົ້າໝາຍການໃຊ້ເງິນກູ້</td><td class="colon">:</td><td class="val">${D.ap_purpose||'-'}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ແຜນການນຳໃຊ້</td><td class="colon">:</td><td class="val">${D.ap_usage||'-'}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ໄລຍະເວລາ</td><td class="colon">:</td><td class="val">${D.ap_term||'-'} ເດືອນ</td></tr>
-      <tr><td class="dash">-</td><td class="lbl">ອັດຕາດອກເບ້ຍ</td><td class="colon">:</td><td class="val">${fmtRatePct(D.ap_rate)}% ຕໍ່ປີ</td></tr>
+      <tr><td class="dash">-</td><td class="lbl">${apprRateLabel(D)}</td><td class="colon">:</td><td class="val">${apprRateValue(D, D.ap_rate)}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ວິທີການຊຳລະດອກເບ້ຍ</td><td class="colon">:</td><td class="val">${D.ap_int_method||'-'}</td></tr>
       <tr><td class="dash">-</td><td class="lbl">ແຫຼ່ງຊຳລະເງິນກູ້</td><td class="colon">:</td><td class="val">${D.repay_src||'ຈາກການດຳເນີນທຸລະກິດ'}</td></tr>
       ${renderDocRepayInlineTableRows(D, D.repayRows)}
@@ -11662,11 +11743,11 @@ function renderLoan(D) {
   h += `<div style="padding-left:20px">`;
   if (loanApprRows.length > 1) {
     loanApprRows.forEach((r, i) => {
-      h += `<div>2.${i + 1} ດອກເບ້ຍສຳລັບ ${escapeHtml(r.currency)}: <strong>${fmtRatePct(r.rate)}% ຕໍ່ປີ</strong>;</div>`;
+      h += `<div>2.${i + 1} ດອກເບ້ຍສຳລັບ ${escapeHtml(r.currency)}: <strong>${apprRateValue(D, r.rate)}</strong>;</div>`;
     });
     h += `<div>2. ການຊຳລະດອກເບ້ຍ: ${D.ap_int_method||'-'}.</div>`;
   } else {
-    h += `<div>1. ອັດຕາດອກເບ້ຍໃຫ້ກູ້ຢືມ: <strong>${fmtRatePct(D.ap_rate)}% ຕໍ່ປີ</strong>;</div>
+    h += `<div>1. ${apprRateLabel(D)} ໃຫ້ກູ້ຢືມ: <strong>${apprRateValue(D, D.ap_rate)}</strong>;</div>
       <div>2. ການຊຳລະດອກເບ້ຍ: ${D.ap_int_method||'-'}.</div>`;
   }
   h += `</div>`;
@@ -12216,7 +12297,7 @@ function renderMinutes550ApprovalBlock(D) {
     ['ວົງເງິນອະນຸມັດ', amount + ' ' + escapeHtml(curr) + formatAmountTextParen(amountText, curr)],
     ['ເປົ້າໝາຍ', escapeHtml(purpose)],
     ['ໄລຍະເວລາກູ້ຢືມ', escapeHtml(String(term)) + ' ເດືອນ'],
-    ['ອັດຕາດອກເບ້ຍ', escapeHtml(fmtRatePct(rate)) + '% ຕໍ່ປີ'],
+    [apprRateLabelText(D), escapeHtml(apprRateValueText(D, rate))],
     ['ແຫຼ່ງທຶນ', 'ທສກ'],
     ['ການຊຳລະດອກເບ້ຍ', escapeHtml(intMethod)]
   ];
@@ -12572,7 +12653,7 @@ function buildResolutionApprovalRows(D, r, feeMode) {
     ['ວົງເງິນອະນຸມັດທັງໝົດ', amount + ' ' + escapeHtml(curr) + formatAmountTextParen(amountText, curr)],
     ['ເປົ້າໝາຍ', escapeHtml(purpose)],
     ['ໄລຍະເວລາກູ້ຢືມ', escapeHtml(String(term)) + ' ເດືອນ'],
-    ['ອັດຕາດອກເບ້ຍ', escapeHtml(fmtRatePct(rate)) + '% ຕໍ່ປີ'],
+    [apprRateLabelText(D), escapeHtml(apprRateValueText(D, rate))],
     ['ການຊຳລະດອກເບ້ຍ', escapeHtml(intMethod)],
     ['ຮູບແບບການກູ້ຢືມ', escapeHtml(loanForm)],
     ['ການຊຳລະຕົ້ນທຶນແບ່ງເປັນ', escapeHtml(repayPrinVal)]
@@ -12929,7 +13010,6 @@ function renderWithdrawLongDoc(D) {
   const docDt = D.a_contract_date || '...........';
   const purpose = D.ap_purpose || '-';
   const term = D.ap_term || '-';
-  const rate = fmtRatePct(D.ap_rate);
   const loanAccNo = formatBankAcctForDoc(D.w_loan_acc_no);
   const depositAccNo = formatBankAcctForDoc(D.w_deposit_acc_no);
   const prevDrawn = parseFloat(String(D.w_prev_drawn || '0').replace(/,/g, '')) || 0;
@@ -12969,7 +13049,7 @@ function renderWithdrawLongDoc(D) {
     <tr><td class="dash">-</td><td class="lbl">ວົງເງິນສິນເຊື່ອອະນຸມັດ</td><td class="colon">:</td><td class="val">${approvedAmt} ${escapeHtml(curr)}</td></tr>
     <tr><td class="dash">-</td><td class="lbl">ເປົ້າໝາຍການນຳໃຊ້</td><td class="colon">:</td><td class="val">${escapeHtml(purpose)}</td></tr>
     <tr><td class="dash">-</td><td class="lbl">ກຳນົດໄລຍະເວລາ</td><td class="colon">:</td><td class="val">${escapeHtml(term)} ເດືອນ</td></tr>
-    <tr><td class="dash">-</td><td class="lbl">ອັດຕາດອກເບ້ຍ</td><td class="colon">:</td><td class="val">${escapeHtml(rate)}% ຕໍ່ປີ</td></tr>
+    <tr><td class="dash">-</td><td class="lbl">${apprRateLabel(D)}</td><td class="colon">:</td><td class="val">${apprRateValue(D, D.ap_rate)}</td></tr>
     <tr><td class="dash">-</td><td class="lbl">ເລກບັນຊີເງິນສິນເຊື່ອ</td><td class="colon">:</td><td class="val"><strong>${escapeHtml(loanAccNo)}</strong></td></tr>
     <tr><td class="dash">-</td><td class="lbl">ເລກບັນຊີເງິນຝາກ</td><td class="colon">:</td><td class="val"><strong>${escapeHtml(depositAccNo)}</strong></td></tr>
   </table>`;
@@ -18557,7 +18637,7 @@ var _FIX_SECTIONS = [
   { key:'pl',       label:'📈 ລາຍຮບ-ຈາຍ (P&L)',       fields:['plRows'] },
   { key:'col',      label:'🏡 ຫກຊບ',                    table:'col_body' },
   { key:'swot',     label:'⚡ SWOT + 4P + ສພາບ',       fields:['swot_env','swot_s','swot_w','swot_o','swot_t','analysis_4p_product','analysis_4p_price','analysis_4p_place','analysis_4p_promotion','swot_risk','swot_mitigation'] },
-  { key:'opinion',  label:'📝 ທດສນະ',                  fields:['tech_verdict','tech_opinion','tsk_verdict','tsk_opinion'] },
+  { key:'opinion',  label:'📝 ທດສນະ',                  fields:['tech_verdict','tech_opinion','tsk_verdict','tsk_opinion','research_over5b_close','chair_over5b_close'] },
 ];
 
 function showAiFixPanel() {
