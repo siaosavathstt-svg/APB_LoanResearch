@@ -1583,6 +1583,13 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
         </div>
       </div>
 
+      <div class="sec-lbl-sub" style="margin-top:14px">📄 ດອກເບ້ຍໃນຟຸດເຕິ (ທຸກເອກະສານ A4)</div>
+      <div class="info-note" style="margin-bottom:10px">ℹ️ ຖ້າວ່າງ — ດຶງຈາກ «ດອກ%/ປີ» ແຖວອະນຸມັts (ແບບເກົ່າ). ຖ້າພິມ — ສະແດງໃນຟຸດເຕິເທົ່ານັ້ນ (ບໍ່ປ່ຽນເອກະສານອະນຸມັts).</div>
+      <div class="field" style="max-width:400px">
+        <label>ດອກເບ້ຍຟຸດເຕິ (ວ່າງ = auto)</label>
+        <input type="text" id="foot_rate" placeholder="ຕົວຢ່າງ: 12.40% ຫຼື AA 12.40%" class="mono" oninput="if(typeof generateDoc==='function')generateDoc()">
+      </div>
+
       <div class="sec-lbl-sub">💰 ຂໍ້ມູນອື່ນໆ</div>
       <div class="grid g3">
         <div class="field"><label>ເປົ້າໝາຍການໃຊ້ງານ <span class="ref">(B3)</span></label><input type="text" id="ap_purpose" value="ຂະຫຍາຍສວນກາເຟ ແລະ ໂຮງປຸງແຕ່ງ-ຕາກເມັດກາເຟ"></div>
@@ -1637,13 +1644,13 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
         </div>
       </div>
       <div class="field" style="margin-top:10px;max-width:520px">
-        <label>ຮູບແບບສະແດງຄ່າທຳນຽມໃນເອກະສານ (ມະຕິ ຂໍ້ 3)</label>
-        <select id="res_fee_mode">
+        <label>ຮູບແບບສະແດງຄ່າທຳນຽມໃນເອກະສານ (ມະຕິ ຂໍ້ 3 · ບົດຄົ້ນຄວ້າ · ໜັງສືປະທານ)</label>
+        <select id="res_fee_mode" onchange="if(typeof generateDoc==='function')generateDoc()">
           <option value="detail" selected>ລະບຸ % ແລະ ຈຳນວນຄ່າທຳນຽມ</option>
           <option value="regulation">ປະຕິບັດຕາມລະບຽບການຂອງ ທສກ</option>
         </select>
       </div>
-      <div class="info-note" style="margin-top:6px">ℹ️ ເລືອກ «ປະຕິບັດຕາມລະບຽບການ» ເມື່ອບໍ່ຕ້ອງການລະບຸ % ຄ່າທຳນຽມໃນມະຕິ.</div>
+      <div class="info-note" style="margin-top:6px">ℹ️ ເລືອກ «ປະຕິບັດຕາມລະບຽບການ» — ບໍ່ລະບຸ %/ຈຳນວນໃນ ມະຕິ, ບົດຄົ້ນຄວ້າ ແລະ ໜັງສືລາຍງານປະທານ.</div>
     </div>
   </div>
 </div>
@@ -5013,6 +5020,17 @@ function apprRateValueText(D, rate) {
 }
 function apprRateValue(D, rate) {
   return escapeHtmlLaoJustify(apprRateValueText(D, rate));
+}
+
+/** ອັດຕາດອກເບ້ຍໃນຟຸດເຕິ — foot_rate ວ່າງ = ap_rate (ຫຼື ຫຼາຍອັດຕາ ຖ້າຫຼາຍສະກຸນ) */
+function getFooterRatePlain(D) {
+  D = D || {};
+  const custom = String(D.foot_rate || '').trim();
+  if (custom) return custom;
+  const apprRows = typeof getApproveTranchesForRender === 'function' ? getApproveTranchesForRender(D) : [];
+  if (apprRows.length > 1) return 'ຫຼາຍອັດຕາ (ຕາມສະກຸນ)';
+  const r = fmtRatePct(D.ap_rate ?? D.rate ?? '');
+  return r !== '—' ? r + '%' : '—';
 }
 
 /** ── Appendix display settings (portrait / per-currency million) ── */
@@ -8905,6 +8923,7 @@ function collectAllData() {
     }),
     ap_purpose: g('ap_purpose'), ap_usage: g('ap_usage'), ap_term: g('ap_term'), ap_rate: g('ap_rate'),
     ap_rate_grade: g('ap_rate_grade'), ap_rate_suffix: g('ap_rate_suffix'),
+    foot_rate: g('foot_rate'),
     ap_repay_display: g('ap_repay_display') || 'detail',
     ap_int_method: g('ap_int_method'), ap_fund_src: g('ap_fund_src'), ap_expiry: gd('ap_expiry'),
     fee_approve: g('fee_approve'), fee_approve_pct: g('fee_approve_pct'),
@@ -9614,8 +9633,7 @@ function apbHeader(title, subtitle, refNo, date) {
 function apbFooter(D = {}, docType = '') {
   const company = D.biz_name || D.company || '-';
   const amount = fmtN(D.ap_amount || D.amount || 0) + ' ' + (D.ap_currency || D.currency || 'ກີບ');
-  const apprRows = getApproveTranchesForRender(D);
-  const rate = apprRows.length > 1 ? 'ຫຼາຍອັດຕາ (ຕາມສະກຸນ)' : fmtRatePct(D.ap_rate || D.rate) + '%';
+  const rate = getFooterRatePlain(D);
   const term = (D.ap_term || D.term || '-') + ' ເດືອນ';
   const amountLabel = (docType === 'research' || docType === 'chairman') ? 'ວົງເງິນສະເໜີອະນຸມັດ' : 'ວົງເງິນອະນຸມັດ';
   const sep = `<span style="margin:0 8px;color:#bbb;font-weight:300">|</span>`;
@@ -9633,14 +9651,13 @@ function buildApbLineFooterHTML(D) {
   const companyName = escapeHtml(String(D.biz_name || D.company || '').trim() || '—');
   const fAmount = parseFloat(D.ap_amount || D.amount) || 0;
   const fCurrency = String(D.ap_currency || D.currency || 'ກີບ').trim();
-  const fRateFmt = fmtRatePct(D.ap_rate ?? D.rate ?? '');
   const fTermRaw = String(D.ap_term ?? D.term ?? '').trim();
+  const ratePlain = getFooterRatePlain(D);
   const amountStr = fAmount > 0 ? `${fmtN(fAmount)} ${escapeHtml(fCurrency)}` : '—';
-  const rateStr = fRateFmt !== '—' ? `${escapeHtml(fRateFmt)}%` : '—';
+  const rateStr = escapeHtml(ratePlain);
   const termStr = fTermRaw ? `${escapeHtml(fTermRaw)} ເດືອນ` : '—';
   const companyRaw = String(D.biz_name || D.company || '').trim() || '—';
   const amountPlain = fAmount > 0 ? `${fmtN(fAmount)} ${fCurrency}` : '—';
-  const ratePlain = fRateFmt !== '—' ? `${fRateFmt}%` : '—';
   const termPlain = fTermRaw ? `${fTermRaw} ເດືອນ` : '—';
   const footerTextString = `${companyRaw} | ວົງເງິນ: ${amountPlain} | ດອກເບ້ຍ: ${ratePlain} | ໄລຍະເວລາ: ${termPlain}`;
   const fs = typeof calcFooterFontSize === 'function' ? calcFooterFontSize(footerTextString.length) : '9pt';
@@ -12788,6 +12805,10 @@ function pushResolutionDetailFeeRows(rows, feeBr, D, opts) {
 }
 
 function buildResearchDocFeeRows(D, r) {
+  const feeMode = D.res_fee_mode || 'detail';
+  if (feeMode === 'regulation') {
+    return [['ຄ່າທຳນຽມ ແລະ ຄ່າບໍລິການ', 'ປະຕິບັດຕາມລະບຽບການຂອງ ທສກ']];
+  }
   const rows = [['ຄ່າທຳນຽມຄົ້ນຄວ້າເອກະສານ', feeAmtCell(fmtN(D.fee_research), 'ກີບ')]];
   const feeBr = r ? getTrancheApprovalFeeBreakdown(D, r) : getSingleTrancheApprovalFeeBreakdown(D);
   pushResolutionDetailFeeRows(rows, feeBr, D, { aligned: true });
@@ -14334,16 +14355,17 @@ function paginatePreview() {
   const companyName = _esc((D.biz_name || D.company || _val('f_company') || '').trim() || '—');
   const fAmount   = parseFloat(D.ap_amount || D.amount || _val('f_amount')) || 0;
   const fCurrency = String(D.ap_currency || D.currency || _val('f_currency') || 'ກີບ').trim();
-  const fRateFmt  = fmtRatePct(D.ap_rate ?? D.rate ?? _val('f_rate') ?? '');
   const fTermRaw  = String(D.ap_term ?? D.term ?? _val('f_term') ?? '').trim();
+  const ratePlain = typeof getFooterRatePlain === 'function'
+    ? getFooterRatePlain({ ...D, foot_rate: D.foot_rate || _val('foot_rate') })
+    : (() => { const r = fmtRatePct(D.ap_rate ?? D.rate ?? _val('f_rate') ?? ''); return r !== '—' ? r + '%' : '—'; })();
 
   const amountStr = fAmount > 0 ? `${_fmtN(fAmount)} ${_esc(fCurrency)}` : '—';
-  const rateStr   = fRateFmt !== '—' ? `${_esc(fRateFmt)}%` : '—';
+  const rateStr   = _esc(ratePlain);
   const termStr   = fTermRaw ? `${_esc(fTermRaw)} ເດືອນ` : '—';
 
   const companyRaw = (D.biz_name || D.company || _val('f_company') || '').trim() || '—';
   const amountPlain = fAmount > 0 ? `${_fmtN(fAmount)} ${fCurrency}` : '—';
-  const ratePlain   = fRateFmt !== '—' ? `${fRateFmt}%` : '—';
   const termPlain   = fTermRaw ? `${fTermRaw} ເດືອນ` : '—';
   const footerTextString =
     `${companyRaw} | ວົງເງິນ: ${amountPlain} | ດອກເບ້ຍ: ${ratePlain} | ໄລຍະເວລາ: ${termPlain}`;
