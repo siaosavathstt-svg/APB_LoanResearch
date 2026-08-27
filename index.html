@@ -1266,6 +1266,17 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="chair_show_swot" onchange="onResSectionDisplayChanged()"> IX. SWOT</label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="chair_show_risk" onchange="onResSectionDisplayChanged()"> X. ຄວາມສ່ຽງ</label>
       </div>
+      <div class="sec-lbl-sub" style="margin-top:10px">📝 ຂໍ້ຄວາມປິດທ້າຍ ໜັງສືລາຍງານປະທານ</div>
+      <div style="display:grid;grid-template-columns:1fr;gap:8px;margin:0 0 14px;padding:10px 12px;background:#f0f7ff;border-left:3px solid #2563eb;border-radius:4px;font-size:12px">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;line-height:1.5">
+          <input type="radio" name="chair_close_mode" value="simple" checked onchange="onResSectionDisplayChanged()" style="margin-top:3px;flex-shrink:0">
+          <span><strong>ແບບ 1 (default):</strong> ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ເພື່ອພິຈາລະນາ ແລະ ມີຄຳເຫັນເປັນທິດຊີ້ນຳຕາມເຫັນສົມຄວນ.</span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;line-height:1.5">
+          <input type="radio" name="chair_close_mode" value="detailed" onchange="onResSectionDisplayChanged()" style="margin-top:3px;flex-shrink:0">
+          <span><strong>ແບບ 2 (ເກົ່າ):</strong> ມີ «ປະທານສະພາບໍລິຫານ» + ຊື່ລູກຄ້າ + ວົງເງິນ / ດອກເບ້ຍ / ໄລຍະ (ດຶງຈາກການອະນຸມັts)</span>
+        </label>
+      </div>
 
       <div class="field">
         <label>1. ສະພາບແວດລ້ອມໂດຍລວມ <span style="font-size:11px;font-weight:400;color:#64748b">(ພາບພົດປະເພດທຸລະກິດອີງຕາມເປົ້າການນຳໃຊ້ເງິນກູ້ ແລະ ສະພາບປັດຈຸບັນ)</span></label>
@@ -1455,14 +1466,44 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
       </div>
 
       <div class="sec-lbl-sub" style="margin-top:14px">📄 ຂໍ້ຄວາມປິດທ້າຍ (> 5 ຕື້ · ບໍ່ສາມາດຕັດສິນໃຈ)</div>
-      <div class="info-note" style="margin-bottom:10px">ℹ️ ສະແດງອັດຕະໂນມັດເມື່ອວົງເງິນອະນຸມັດ &gt; 5 ຕື້ ແລະ verdict = «ບໍ່ສາມາດຕັດສິນໃຈ». ຫຼື ເລືອກບັງຄັບສະແດງເຖິງວົງເງິນບໍ່ເຖິງ 5 ຕື້.</div>
+      <div class="info-note" style="margin-bottom:10px">ℹ️ <strong>ແບບ 1:</strong> ອະນຸມັດໃໝ່ &gt; 5 ຕື້ + verdict «ບໍ່ສາມາດຕັດສິນໃຈ». <strong>ແບບ 2:</strong> APB ຄ້າງ + ອະນຸມັດໃໝ່ &gt; 5 ຕື້ (CIB ແຖວ ທສກ/APB). ທັງສອງແບບມີ «ບັງຄັບສະແດງ».</div>
       <div class="field">
         <label>ບົດຄົ້ນຄວ້າ — ຍ່າງ bold ກ່ອນ «ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານ...»</label>
-        <textarea id="research_over5b_close" rows="4" style="width:100%">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງພະແນກສິນເຊື່ອ ແລະ ຄະນະຜູ້ອຳນວຍການ. ສະນັ້ນ, ທສກ ຈຶ່ງຂໍສ້າງໜັງສືລາຍງານອີກໜຶ່ງສະບັບ ເພື່ອຮຽນສະເໜີຂໍທິດຊີ້ນຳຈາກສະພາບໍລິຫານ ໃຫ້ເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປ</textarea>
-        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px">
-          <input type="checkbox" id="research_force_over5b_close" onchange="if(typeof generateDoc==='function'&&['research','chairman','chairman_vip'].includes(currentDoc))generateDoc()">
-          <span><strong>ບັງຄັບສະແດງ</strong> — ສະແດງຂໍ້ຄວາມນີ້ໃນບົດຄົ້ນຄວ້າ ເຖິງວົງເງິນບໍ່ເຖິງ 5 ຕື້</span>
-        </label>
+        <div style="display:grid;gap:8px;margin-bottom:10px;padding:10px 12px;background:#f4f8f8;border-left:3px solid #006b6b;border-radius:4px;font-size:12px">
+          <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer">
+            <input type="radio" name="research_close_mode" value="default" checked onchange="onResearchCloseModeChanged()">
+            <span><strong>ແບບ 1</strong> — ຂໍທິດຊີ້ນຳຈາກສະພາ (ອະນຸມັດໃໝ່ &gt; 5 ຕື້ · logic ເກົ່າ)</span>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer">
+            <input type="radio" name="research_close_mode" value="existing_customer" onchange="onResearchCloseModeChanged()">
+            <span><strong>ແບບ 2</strong> — ລູກຄ້າເກົ່າ ມີຍອດກູ້ APB (APB ຄ້າງ + ອະນຸມັດໃໝ່ &gt; 5 ຕື້)</span>
+          </label>
+        </div>
+        <div id="research_close_mode_default">
+          <textarea id="research_over5b_close" rows="4" style="width:100%">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງພະແນກສິນເຊື່ອ ແລະ ຄະນະຜູ້ອຳນວຍການ. ສະນັ້ນ, ທສກ ຈຶ່ງຂໍສ້າງໜັງສືລາຍງານອີກໜຶ່ງສະບັບ ເພື່ອຮຽນສະເໜີຂໍທິດຊີ້ນຳຈາກສະພາບໍລິຫານ ໃຫ້ເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປ</textarea>
+          <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px">
+            <input type="checkbox" id="research_force_over5b_close" onchange="if(typeof generateDoc==='function'&&['research','chairman','chairman_vip'].includes(currentDoc))generateDoc()">
+            <span><strong>ບັງຄັບສະແດງແບບ 1</strong> — ເຖິງວົງເງິນອະນຸມັດໃໝ່ບໍ່ເຖິງ 5 ຕື້</span>
+          </label>
+        </div>
+        <div id="research_close_mode_existing" style="display:none;margin-top:4px">
+          <button type="button" class="add-row-btn" style="margin:0 0 10px;width:auto;display:inline-flex" onclick="fillExistingCustomerCloseFromSnapshot()">📥 ດຶງຈາກ CIB (APB ເທົ່ານັ້ນ) + ອະນຸມັດ</button>
+          <div class="grid g3" style="margin-bottom:8px">
+            <div class="field"><label>ຈຳນວນບ້ວງ APB ຄ້າງ</label><input type="text" id="research_close_exist_cnt" class="mono" placeholder="2" oninput="updateExistingCloseHint()"></div>
+            <div class="field"><label>ຍອດເຫຼືອ APB</label><input type="text" id="research_close_exist_amt" class="mono fnum" placeholder="2,200,000,000" oninput="updateExistingCloseHint()"></div>
+            <div class="field"><label>ສະກຸນ (ຄ້າງ)</label><select id="research_close_exist_curr" onchange="updateExistingCloseHint()"><option value="ກີບ" selected>ກີບ</option><option value="ບາດ">ບາດ</option><option value="ໂດລາ">ໂດລາ</option></select></div>
+            <div class="field"><label>ວົງເງິນກູ້ຢືມຄັ້ງນີ້</label><input type="text" id="research_close_new_amt" class="mono fnum" placeholder="4,000,000,000" oninput="updateExistingCloseHint()"></div>
+            <div class="field"><label>ສະກຸນ (ຄັ້ງນີ້)</label><select id="research_close_new_curr" onchange="updateExistingCloseHint()"><option value="ກີບ" selected>ກີບ</option><option value="ບາດ">ບາດ</option><option value="ໂດລາ">ໂດລາ</option></select></div>
+            <div class="field"><label>ລວມທັງໝົດ</label><input type="text" id="research_close_total_amt" class="mono fnum" placeholder="7,200,000,000" oninput="updateExistingCloseHint()"></div>
+            <div class="field"><label>ສະກຸນ (ລວມ)</label><select id="research_close_total_curr" onchange="updateExistingCloseHint()"><option value="ກີບ" selected>ກີບ</option><option value="ບາດ">ບາດ</option><option value="ໂດລາ">ໂດລາ</option></select></div>
+          </div>
+          <div id="research_existing_close_hint" class="info-note" style="margin-bottom:8px">ℹ️ ກົດ «ດຶງຈາກ CIB» ເພື່ອຄິນແລະເຕີມຊ່ອງ (ແກ້ໄດ້ຫຼັງດຶງ).</div>
+          <textarea id="research_existing_close" rows="5" style="width:100%" oninput="if(typeof generateDoc==='function'&&currentDoc==='research')generateDoc()">ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າ ລູກຄ້າດັ່ງກ່າວເປັນລູກຄ້າເກົ່າ ຂອງ ທສກ ມີຍອດເງິນກູ້ຄ້າງຢູ່ກັບ ທສກ ຈຳນວນ {EXIST_CNT} ບ້ວງ ເປັນວົງເງິນ {EXIST_AMT} {EXIST_CURR}, ຖ້າບວກກັບເງິນກູ້ບ້ວງນີ້ ເປັນວົງເງິນ {NEW_AMT} {NEW_CURR} ລວມທັງໝົດເປັນ {TOTAL_AMT} {TOTAL_CURR}. ສະນັ້ນ, ພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງພະແນກສິນເຊື່ອ ແລະ ຄະນະຜູ້ອຳນວຍການ. ສະນັ້ນ, ທສກ ຈຶ່ງຂໍສ້າງໜັງສືລາຍງານອີກໜຶ່ງສະບັບ ເພື່ອຮຽນສະເໜີຂໍທິດຊີ້ນໍາຈາກສະພາບໍລິຫານ ໃຫ້ເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປ.</textarea>
+          <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px">
+            <input type="checkbox" id="research_force_existing_close" onchange="if(typeof generateDoc==='function'&&currentDoc==='research')generateDoc()">
+            <span><strong>ບັງຄັບສະແດງແບບ 2</strong> — ເຖິງລວມບໍ່ເຖິງ 5 ຕື້</span>
+          </label>
+        </div>
       </div>
       <div class="field" style="margin-top:10px">
         <label>ໜັງສືລາຍງານປະທານ — ຍ່າງ bold ກ່ອນ «ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານ...»</label>
@@ -8795,7 +8836,17 @@ function collectAllData() {
     analysis_4p_promotion: g('analysis_4p_promotion'),
     // Opinion
     tech_verdict: g('tech_verdict'), tech_opinion: g('tech_opinion'), tsk_verdict: g('tsk_verdict'), tsk_opinion: g('tsk_opinion'), loan_conditions: g('loan_conditions'),
+    research_close_mode: document.querySelector('input[name="research_close_mode"]:checked')?.value || 'default',
     research_over5b_close: g('research_over5b_close'),
+    research_existing_close: g('research_existing_close'),
+    research_close_exist_cnt: g('research_close_exist_cnt'),
+    research_close_exist_amt: g('research_close_exist_amt'),
+    research_close_exist_curr: g('research_close_exist_curr'),
+    research_close_new_amt: g('research_close_new_amt'),
+    research_close_new_curr: g('research_close_new_curr'),
+    research_close_total_amt: g('research_close_total_amt'),
+    research_close_total_curr: g('research_close_total_curr'),
+    research_force_existing_close: !!document.getElementById('research_force_existing_close')?.checked,
     chair_over5b_close: g('chair_over5b_close'),
     research_force_over5b_close: !!document.getElementById('research_force_over5b_close')?.checked,
     chair_force_over5b_close: !!document.getElementById('chair_force_over5b_close')?.checked,
@@ -8808,6 +8859,7 @@ function collectAllData() {
     chair_show_swot: !!document.getElementById('chair_show_swot')?.checked,
     chair_show_4p: !!document.getElementById('chair_show_4p')?.checked,
     chair_show_risk: !!document.getElementById('chair_show_risk')?.checked,
+    chair_close_mode: document.querySelector('input[name="chair_close_mode"]:checked')?.value || 'simple',
     res_show_sec1_usage: !!document.getElementById('res_show_sec1_usage')?.checked,
     res_show_sec1_repay_prin: !!document.getElementById('res_show_sec1_repay_prin')?.checked,
     res_show_sec1_repay_int: !!document.getElementById('res_show_sec1_repay_int')?.checked,
@@ -9675,6 +9727,122 @@ function shouldShowOver5BClose(D, kind) {
   if (!isApprovalOver5B(D)) return false;
   const verdict = kind === 'chair' ? D.tsk_verdict : D.tech_verdict;
   return (verdict || '') === 'ບໍ່ສາມາດຕັດສິນໃຈ';
+}
+
+
+const DEFAULT_RESEARCH_EXISTING_CLOSE = 'ຜ່ານການຄົ້ນຄວ້າຕໍ່ກັບການສະເໜີດັ່ງກ່າວ ເຫັນວ່າ ລູກຄ້າດັ່ງກ່າວເປັນລູກຄ້າເກົ່າ ຂອງ ທສກ ມີຍອດເງິນກູ້ຄ້າງຢູ່ກັບ ທສກ ຈຳນວນ {EXIST_CNT} ບ້ວງ ເປັນວົງເງິນ {EXIST_AMT} {EXIST_CURR}, ຖ້າບວກກັບເງິນກູ້ບ້ວງນີ້ ເປັນວົງເງິນ {NEW_AMT} {NEW_CURR} ລວມທັງໝົດເປັນ {TOTAL_AMT} {TOTAL_CURR}. ສະນັ້ນ, ພວກເຮົາບໍ່ສາມາດຕັດສິນໃຈໄດ້ ແລະ ເກີນສິດອະນຸມັດຂອງພະແນກສິນເຊື່ອ ແລະ ຄະນະຜູ້ອຳນວຍການ. ສະນັ້ນ, ທສກ ຈຶ່ງຂໍສ້າງໜັງສືລາຍງານອີກໜຶ່ງສະບັບ ເພື່ອຮຽນສະເໜີຂໍທິດຊີ້ນໍາຈາກສະພາບໍລິຫານ ໃຫ້ເປັນບ່ອນອີງໃນການຈັດຕັ້ງປະຕິບັດຂັ້ນຕໍ່ໄປ.';
+
+function isApbCibBank(bankName) {
+  const raw = String(bankName || '').trim();
+  if (!raw) return false;
+  const compact = raw.replace(/\s+/g, '');
+  if (/APB|AGRICULTURALPROMOTION/i.test(compact)) return true;
+  if (/ທສກ|ສົ່ງເສີມກະສິກຳ/.test(compact)) return true;
+  if (/ທ\.?\s*ສ\.?\s*ກ/.test(raw)) return true;
+  return false;
+}
+
+function calcExistingCustomerCloseSnapshot(D) {
+  D = D || (typeof collectAllData === 'function' ? collectAllData() : {});
+  const rows = D.cibRows || [];
+  let existCnt = 0, existBalLak = 0;
+  rows.forEach(r => {
+    if (!isApbCibBank(r.bank)) return;
+    const bal = parseN(r.balance);
+    if (bal <= 0) return;
+    existCnt++;
+    existBalLak += cibToLakAmount(bal, r.currency, D);
+  });
+  const apprRows = typeof getApproveTranchesForRender === 'function' ? getApproveTranchesForRender(D) : [];
+  let newCnt = 0, newApprLak = 0;
+  apprRows.forEach(r => {
+    const amt = parseN(r.amount);
+    if (amt <= 0) return;
+    newCnt++;
+    newApprLak += cibToLakAmount(amt, r.currency, D);
+  });
+  return { existCnt, existBalLak, newCnt, newApprLak, totalLak: existBalLak + newApprLak };
+}
+
+function getExistingCustomerCloseTotalLak(D) {
+  const manual = parseN(D.research_close_total_amt);
+  if (manual > 0) return manual;
+  return calcExistingCustomerCloseSnapshot(D).totalLak;
+}
+
+function fillExistingCustomerCloseFromSnapshot() {
+  const snap = calcExistingCustomerCloseSnapshot();
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+  set('research_close_exist_cnt', String(snap.existCnt || 0));
+  set('research_close_exist_amt', fmtN(snap.existBalLak || 0));
+  set('research_close_new_amt', fmtN(snap.newApprLak || 0));
+  set('research_close_new_curr', 'ກີບ');
+  set('research_close_total_amt', fmtN(snap.totalLak || 0));
+  set('research_close_exist_curr', 'ກີບ');
+  set('research_close_total_curr', 'ກີບ');
+  updateExistingCloseHint();
+  if (typeof generateDoc === 'function' && currentDoc === 'research') generateDoc();
+}
+
+function updateExistingCloseHint() {
+  const el = document.getElementById('research_existing_close_hint');
+  if (!el) return;
+  const snap = calcExistingCustomerCloseSnapshot();
+  const total = parseN(document.getElementById('research_close_total_amt')?.value) || snap.totalLak;
+  const over = total > 5000000000;
+  el.textContent = over
+    ? '✓ ລວມ ' + fmtN(total) + ' ກີບ — ເກີນ 5 ຕື້ (ສະແດງອັດຕະໂນມັດເມື່ອ verdict = ບໍ່ສາມາດຕັດສິນໃຈ)'
+    : '⚠ ລວມ ' + fmtN(total) + ' ກີບ — ຍັງບໍ່ເຖິງ 5 ຕື້ (ໃຊ້ «ບັງຄັບສະແດງ» ຖ້າຕ້ອງການ)';
+}
+
+function onResearchCloseModeChanged() {
+  const mode = document.querySelector('input[name="research_close_mode"]:checked')?.value || 'default';
+  const d = document.getElementById('research_close_mode_default');
+  const e = document.getElementById('research_close_mode_existing');
+  if (d) d.style.display = mode === 'default' ? '' : 'none';
+  if (e) e.style.display = mode === 'existing_customer' ? '' : 'none';
+  if (mode === 'existing_customer') updateExistingCloseHint();
+  if (typeof generateDoc === 'function' && ['research','chairman','chairman_vip'].includes(currentDoc)) generateDoc();
+}
+
+function getExistingCustomerCloseText(D) {
+  const tpl = String(D.research_existing_close || DEFAULT_RESEARCH_EXISTING_CLOSE).trim();
+  const existCnt = String(D.research_close_exist_cnt || '').trim() || '....';
+  const existAmt = String(D.research_close_exist_amt || '').trim() || '..........';
+  const existCurr = String(D.research_close_exist_curr || 'ກີບ').trim();
+  const newAmt = String(D.research_close_new_amt || '').trim() || '..........';
+  const newCurr = String(D.research_close_new_curr || 'ກີບ').trim();
+  const totalAmt = String(D.research_close_total_amt || '').trim() || '..........';
+  const totalCurr = String(D.research_close_total_curr || 'ກີບ').trim();
+  return tpl
+    .replace(/\{EXIST_CNT\}/g, existCnt)
+    .replace(/\{EXIST_AMT\}/g, existAmt)
+    .replace(/\{EXIST_CURR\}/g, existCurr)
+    .replace(/\{NEW_AMT\}/g, newAmt)
+    .replace(/\{NEW_CURR\}/g, newCurr)
+    .replace(/\{NEW_CNT\}/g, newAmt + (newCurr ? ' ' + newCurr : ''))
+    .replace(/\{TOTAL_AMT\}/g, totalAmt)
+    .replace(/\{TOTAL_CURR\}/g, totalCurr);
+}
+
+function shouldShowExistingCustomerClose(D) {
+  if (D.research_force_existing_close) return true;
+  if ((D.tech_verdict || '') !== 'ບໍ່ສາມາດຕັດສິນໃຈ') return false;
+  return getExistingCustomerCloseTotalLak(D) > 5000000000;
+}
+
+function shouldShowResearchClose(D) {
+  const mode = D.research_close_mode || 'default';
+  if (mode === 'existing_customer') return shouldShowExistingCustomerClose(D);
+  return shouldShowOver5BClose(D, 'research');
+}
+
+function renderResearchCloseParagraph(D) {
+  let txt;
+  if ((D.research_close_mode || 'default') === 'existing_customer') txt = getExistingCustomerCloseText(D);
+  else txt = getOver5BCloseText(D, 'research');
+  if (!txt) return '';
+  return `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px;font-weight:700">${escapeHtmlLaoJustify(txt)}</p>`;
 }
 
 function renderOver5BCloseParagraph(D, kind) {
@@ -11137,13 +11305,18 @@ function renderResearch(D, variant) {
     if (shouldShowOver5BClose(D, 'chair')) {
       h += renderOver5BCloseParagraph(D, 'chair');
     }
-    // ຂໍ້ຄວາມຮຽນລາຍງານ (ທັງ ທົ່ວໄປ ແລະ VIP) — ພ້ອມ ຊື່ບໍລິສັດ/ວົງເງິນ/ດອກເບ້ຍ/ໄລຍະ
-    h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px">ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ປະທານສະພາບໍລິຫານ ເພື່ອພິຈາລະນາ ແລະ ອະນຸມັດ ຕໍ່ກັບການສະເໜີກູ້ຢືມຂອງ ${_bizStr} ${_loanDetail}ຕາມເຫັນສົມຄວນດ້ວຍ.</p>`;
+    // ຂໍ້ຄວາມຮຽນລາຍງານ (ທັງ ທົ່ວໄປ ແລະ VIP) — ແບບ 1=ສັ້ນ (default) · ແບບ 2=ເກົ່າ (ລະອຽດ)
+    const _chairCloseMode = D.chair_close_mode === 'detailed' ? 'detailed' : 'simple';
+    if (_chairCloseMode === 'detailed') {
+      h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px">ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ປະທານສະພາບໍລິຫານ ເພື່ອພິຈາລະນາ ແລະ ອະນຸມັດ ຕໍ່ກັບການສະເໜີກູ້ຢືມຂອງ ${_bizStr} ${_loanDetail}ຕາມເຫັນສົມຄວນດ້ວຍ.</p>`;
+    } else {
+      h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px">ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ເພື່ອພິຈາລະນາ ແລະ ມີຄຳເຫັນເປັນທິດຊີ້ນຳຕາມເຫັນສົມຄວນ.</p>`;
+    }
     h += buildChairmanSignoffBlock();
   } else {
     h += `<div class="signature-section">`;
-    if (shouldShowOver5BClose(D, 'research')) {
-      h += renderOver5BCloseParagraph(D, 'research');
+    if (shouldShowResearchClose(D)) {
+      h += renderResearchCloseParagraph(D);
     }
     h += `<p class="apb-doc-close" style="text-indent:40px;text-align:justify;margin:14px 0 10px">ດັ່ງນັ້ນ, ຈຶ່ງຂໍຮຽນລາຍງານມາຍັງທ່ານ ເພື່ອພິຈາລະນາ ແລະ ມີຄຳເຫັນເປັນທິດຊີ້ນຳຕາມເຫັນສົມຄວນ.</p>`;
     h += `<div style="text-align:right;margin:8px 40px 4px">ດ້ວຍຄວາມນັບຖືຢ່າງສູງ</div>`;
@@ -18637,7 +18810,7 @@ var _FIX_SECTIONS = [
   { key:'pl',       label:'📈 ລາຍຮບ-ຈາຍ (P&L)',       fields:['plRows'] },
   { key:'col',      label:'🏡 ຫກຊບ',                    table:'col_body' },
   { key:'swot',     label:'⚡ SWOT + 4P + ສພາບ',       fields:['swot_env','swot_s','swot_w','swot_o','swot_t','analysis_4p_product','analysis_4p_price','analysis_4p_place','analysis_4p_promotion','swot_risk','swot_mitigation'] },
-  { key:'opinion',  label:'📝 ທດສນະ',                  fields:['tech_verdict','tech_opinion','tsk_verdict','tsk_opinion','research_over5b_close','chair_over5b_close'] },
+  { key:'opinion',  label:'📝 ທດສນະ',                  fields:['tech_verdict','tech_opinion','tsk_verdict','tsk_opinion','research_over5b_close','research_existing_close','chair_over5b_close'] },
 ];
 
 function showAiFixPanel() {
@@ -19353,6 +19526,15 @@ function loadFormJSON(event) {
         showSWOTOverallRating(data.swot_overall_rating);
       }
       syncSWOTMatrixFromFields();
+      if (data.research_close_new_cnt && !data.research_close_new_amt) {
+        const el = document.getElementById('research_close_new_amt');
+        if (el) el.value = data.research_close_new_cnt;
+      }
+      if (data.research_close_mode) {
+        const rcm = document.querySelector(`input[name="research_close_mode"][value="${data.research_close_mode}"]`);
+        if (rcm) rcm.checked = true;
+      }
+      if (typeof onResearchCloseModeChanged === 'function') onResearchCloseModeChanged();
       if (data.col_display_mode) {
         const cr = document.querySelector(`input[name="col_display_mode"][value="${data.col_display_mode}"]`);
         if (cr) cr.checked = true;
@@ -19379,6 +19561,10 @@ function loadFormJSON(event) {
           if (r) r.checked = true;
         }
       });
+      if (data.chair_close_mode) {
+        const _ccr = document.querySelector(`input[name="chair_close_mode"][value="${data.chair_close_mode}"]`);
+        if (_ccr) _ccr.checked = true;
+      }
       if (data.a_notify_signer) {
         const nr = document.querySelector(`input[name="a_notify_signer"][value="${data.a_notify_signer}"]`);
         if (nr) nr.checked = true;
