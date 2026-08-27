@@ -9122,8 +9122,8 @@ function onResUsageDisplayChanged() {
 }
 function apbResNarrativeBlock(text, emptyMsg) {
   const t = String(text || '').trim();
-  if (!t) return `<p style="text-indent:40px;color:#999;margin:6px 0">${emptyMsg || '(ບໍ່ໄດ້ປ້ອນ)'}</p>`;
-  return `<p class="apb-justify-lo" lang="lo" style="text-indent:40px;text-align:justify;margin:6px 0;white-space:pre-wrap">${escapeHtmlLaoJustify(t)}</p>`;
+  if (!t) return `<p class="apb-opinion-para" style="text-indent:40px;color:#999;margin:6px 0">${emptyMsg || '(ບໍ່ໄດ້ປ້ອນ)'}</p>`;
+  return formatOpinionHTML(t);
 }
 
 /** Split opinion only at blank lines (user paragraph breaks) — no auto sentence/length split. */
@@ -10575,11 +10575,11 @@ function renderResearch(D, variant) {
   const ownerHist = typeof buildVipOwnerHistory === 'function' ? buildVipOwnerHistory(D) : '';
   if (ownerHist) {
     h += `<div class="apb-sec-sub">2. ປະຫວັດໂດຍຫຍໍ້ເຈົ້າຂອງທຸລະກິດ.</div>`;
-    h += `<p style="text-indent:40px;text-align:justify;margin:6px 0">${escapeHtmlLaoJustify(ownerHist)}</p>`;
+    h += formatOpinionHTML(ownerHist);
   }
 
   h += `<div class="apb-sec-sub">3. ປະຫວັດການດຳເນີນທຸລະກິດໂດຍຫຍໍ້.</div>`;
-  h += `<p style="text-indent:40px;text-align:justify;margin:6px 0;white-space:pre-wrap">${escapeHtmlLaoJustify(D.c_biz_history)||'(ບໍ່ໄດ້ປ້ອນ)'}</p>`;
+  h += formatOpinionHTML(D.c_biz_history, '(ບໍ່ໄດ້ປ້ອນ)');
 
   const cibMode = D.res_cib_display || 'text';
   const depMode = D.res_dep_display || 'text';
@@ -10610,7 +10610,7 @@ function renderResearch(D, variant) {
   const _bizOverview = String(D.c_biz_overview || '').trim();
   if (_bizOverview && _bizOverview !== '(ບໍ່ໄດ້ປ້ອນ)') {
     h += `<div class="apb-sec-sub">5. ພາບລວມການດຳເນີນທຸລະກິດ.</div>`;
-    h += `<p style="text-indent:40px;text-align:justify;margin:6px 0;white-space:pre-wrap">${escapeHtmlLaoJustify(_bizOverview)}</p>`;
+    h += formatOpinionHTML(_bizOverview);
   }
 
   // III. ທຶນ (Capital)
@@ -10991,11 +10991,9 @@ function renderResearch(D, variant) {
   h += apbCollateralValuationDocHTML(D);
 
   if (showCond) {
-  // VII. ສະພາບແວດລ້ອມ (Conditions) — pack ຫົວຂໍ້+ຍ່ອຫນ້າດຽວ
-  h += `<div class="apb-sec-pack">`;
+  // VII. ສະພາບແວດລ້ອມ (Conditions)
   h += `<div class="apb-sec-head">VII. ສະພາບແວດລ້ອມ (Conditions).</div>`;
-  h += `<p style="margin:6px 0 12px;text-indent:36px;text-align:justify;line-height:1.55;font-size:12pt;white-space:pre-wrap">${escapeHtmlLaoJustify(D.swot_env||'')||'(ຍັງບໍ່ມີຂໍ້ຄວາມ)'}</p>`;
-  h += `</div>`;
+  h += formatOpinionHTML(D.swot_env, '(ຍັງບໍ່ມີຂໍ້ຄວາມ)');
   }
 
   if (show4p) {
@@ -13697,6 +13695,100 @@ function _cutParagraphAtLimitY(p, pg, maxY) {
   return tail;
 }
 
+/** Try cut after lifting trailing headings — frees vertical room (e.g. IV. head before Capacity prose). */
+function _cutParagraphWithHeadRetry(p, pg, maxY) {
+  let tail = _cutParagraphAtLimitY(p, pg, maxY);
+  if (tail || !p || p.parentNode !== pg) return tail;
+  const orphans = [];
+  let prev = p.previousElementSibling;
+  while (prev && _isHeadingLike(prev)) {
+    orphans.unshift(pg.removeChild(prev));
+    prev = p.previousElementSibling;
+  }
+  if (!orphans.length) return null;
+  tail = _cutParagraphAtLimitY(p, pg, maxY);
+  if (tail) {
+    orphans.forEach(o => pg.insertBefore(o, p));
+    return tail;
+  }
+  orphans.forEach(o => pg.insertBefore(o, p));
+  return null;
+}
+
+function _minProseSlackPx() { return 14; }
+
+/** Next-page head + splittable <p> pair (or lone <p>) suitable for slack fill. */
+function _nextProsePullCandidate(nextPage) {
+  const kids = _pageContentChildren(nextPage);
+  if (!kids.length) return null;
+  if (_blockHasManualPageBreak(kids[0]) && !_blockIsPullUpTarget(kids[0])) return null;
+  let lead = [];
+  let para = null;
+  if (_isHeadingLike(kids[0]) && kids[1] && kids[1].tagName === 'P' && _isSplittableParagraph(kids[1])) {
+    lead = [kids[0]];
+    para = kids[1];
+  } else if (kids[0].tagName === 'P' && _isSplittableParagraph(kids[0])) {
+    para = kids[0];
+  }
+  if (!para) return null;
+  return { lead, para };
+}
+
+/** Pull splittable prose from next page onto prev-page slack (line split, not whole block). */
+function _fillPageSlackWithProse(prevPage, nextPage) {
+  if (!prevPage || !nextPage || _docFreePageLayout()) return false;
+  const limitY = _pageFooterLimitY(prevPage);
+  const slack = limitY - _pageContentBottomPx(prevPage);
+  if (slack < _minProseSlackPx()) return false;
+
+  const cand = _nextProsePullCandidate(nextPage);
+  if (!cand) return false;
+  const { lead, para } = cand;
+  const leadH = lead.reduce((s, el) => s + (el.offsetHeight || 0), 0);
+  if (leadH > slack + 2) return false;
+
+  const insertBefore = para.nextElementSibling;
+  lead.forEach(el => prevPage.appendChild(el));
+  prevPage.appendChild(para);
+
+  if (_pageContentBottomPx(prevPage) <= limitY) return true;
+
+  const tail = _cutParagraphWithHeadRetry(para, prevPage, limitY);
+  if (tail) {
+    const tailAnchor = (insertBefore && insertBefore.parentNode === nextPage)
+      ? insertBefore
+      : (nextPage.querySelector('.apb-page-bottom, .apb-pdf-footer') || null);
+    if (tailAnchor) nextPage.insertBefore(tail, tailAnchor);
+    else nextPage.appendChild(tail);
+    return true;
+  }
+
+  prevPage.removeChild(para);
+  lead.forEach(el => prevPage.removeChild(el));
+  if (insertBefore && insertBefore.parentNode === nextPage) {
+    nextPage.insertBefore(para, insertBefore);
+    lead.slice().reverse().forEach(el => nextPage.insertBefore(el, para));
+  } else {
+    lead.forEach(el => nextPage.appendChild(el));
+    nextPage.appendChild(para);
+  }
+  return false;
+}
+
+function _fillLoosePageSlackWithProse(previewEl) {
+  if (!previewEl || _docFreePageLayout()) return;
+  let guard = 0;
+  let changed = true;
+  while (changed && guard++ < 60) {
+    changed = false;
+    const pages = Array.from(previewEl.querySelectorAll('.preview-a4-page'));
+    for (let i = 0; i < pages.length - 1; i++) {
+      if (_fillPageSlackWithProse(pages[i], pages[i + 1])) changed = true;
+    }
+  }
+  pruneEmptyPreviewPages(previewEl);
+}
+
 /** After footers are pinned, move overflow blocks to the next page (print safety). */
 function _guardFooterOverlap(previewEl) {
   if (!previewEl) return;
@@ -13731,7 +13823,7 @@ function _guardFooterOverlap(previewEl) {
         continue;
       }
       if (_isSplittableParagraph(last)) {
-        const tail = _cutParagraphAtLimitY(last, p, limitY);
+        const tail = _cutParagraphWithHeadRetry(last, p, limitY);
         if (tail) {
           const contAnchor = _pageContentChildren(next)[0] ||
             next.querySelector('.apb-page-bottom, .apb-pdf-footer');
@@ -13924,7 +14016,10 @@ function _healOrphanSectionHeads(previewEl) {
         const group = _blocksToPullFromNextPage(next, prev);
         if (!group.length) break;
         const need = group.reduce((s, el) => s + (el.offsetHeight || 0), 0);
-        if (!_pageHasRoomBeforeFooter(prev, need)) break;
+        if (!_pageHasRoomBeforeFooter(prev, need)) {
+          if (_fillPageSlackWithProse(prev, next)) { changed = true; continue; }
+          break;
+        }
         group.forEach(el => prev.appendChild(el));
         changed = true;
       }
@@ -14225,12 +14320,16 @@ function packPageSlack(previewEl) {
         if (!_tryMoveGroupOntoPage(prev, group)) continue;
       } else {
         const need = group.reduce((s, el) => s + (el.offsetHeight || 0), 0);
-        if (need <= 0 || !_pageHasRoomBeforeFooter(prev, need)) continue;
+        if (need <= 0 || !_pageHasRoomBeforeFooter(prev, need)) {
+          if (_fillPageSlackWithProse(prev, next)) changed = true;
+          continue;
+        }
         group.forEach(el => prev.appendChild(el));
       }
       changed = true;
     }
   }
+  if (!_docFreePageLayout()) _fillLoosePageSlackWithProse(previewEl);
   _healOrphanSectionHeads(previewEl);
   pruneEmptyPreviewPages(previewEl);
 }
@@ -14644,7 +14743,7 @@ function paginatePreview() {
     };
 
     const _cutParagraphAtPageLimit = (p, pg) =>
-      _cutParagraphAtLimitY(p, pg, _pageMaxContentBottomPx(pg, _footerClearMm) + TOLERANCE_PX);
+      _cutParagraphWithHeadRetry(p, pg, _pageMaxContentBottomPx(pg, _footerClearMm) + TOLERANCE_PX);
 
     const _moveBlockToNextPage = (blk, pg) => {
       const orphans = [];
