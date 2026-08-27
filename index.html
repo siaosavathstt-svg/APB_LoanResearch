@@ -13789,6 +13789,51 @@ function _fillLoosePageSlackWithProse(previewEl) {
   pruneEmptyPreviewPages(previewEl);
 }
 
+function _isInfoSec12Table(el) {
+  return el && el.tagName === 'TABLE' && el.classList && el.classList.contains('apb-info-tbl-sec12');
+}
+
+/** Pull leading rows from a split info-table continuation on the next page into prev-page slack. */
+function _fillPageSlackWithInfoTableRows(prevPage, nextPage) {
+  if (!prevPage || !nextPage || _docFreePageLayout()) return false;
+  const pk = _pageContentChildren(prevPage);
+  const nk = _pageContentChildren(nextPage);
+  if (!pk.length || !nk.length) return false;
+  const prevTbl = pk[pk.length - 1];
+  const nextTbl = nk[0];
+  if (!_isInfoSec12Table(prevTbl) || !_isInfoSec12Table(nextTbl)) return false;
+  const prevTb = prevTbl.tBodies[0];
+  const nextTb = nextTbl.tBodies[0];
+  if (!prevTb || !nextTb || !nextTb.rows.length) return false;
+
+  let moved = false;
+  while (nextTb.rows.length) {
+    const row = nextTb.rows[0];
+    const rowH = row.offsetHeight || 22;
+    if (!_pageHasRoomBeforeFooter(prevPage, rowH)) break;
+    prevTb.appendChild(row);
+    moved = true;
+  }
+  if (moved && !nextTb.rows.length && nextTbl.parentNode === nextPage) {
+    nextPage.removeChild(nextTbl);
+  }
+  return moved;
+}
+
+function _fillLoosePageSlackWithInfoTables(previewEl) {
+  if (!previewEl || _docFreePageLayout()) return;
+  let guard = 0;
+  let changed = true;
+  while (changed && guard++ < 40) {
+    changed = false;
+    const pages = Array.from(previewEl.querySelectorAll('.preview-a4-page'));
+    for (let i = 0; i < pages.length - 1; i++) {
+      if (_fillPageSlackWithInfoTableRows(pages[i], pages[i + 1])) changed = true;
+    }
+  }
+  pruneEmptyPreviewPages(previewEl);
+}
+
 /** After footers are pinned, move overflow blocks to the next page (print safety). */
 function _guardFooterOverlap(previewEl) {
   if (!previewEl) return;
@@ -14017,6 +14062,7 @@ function _healOrphanSectionHeads(previewEl) {
         if (!group.length) break;
         const need = group.reduce((s, el) => s + (el.offsetHeight || 0), 0);
         if (!_pageHasRoomBeforeFooter(prev, need)) {
+          if (_fillPageSlackWithInfoTableRows(prev, next)) { changed = true; continue; }
           if (_fillPageSlackWithProse(prev, next)) { changed = true; continue; }
           break;
         }
@@ -14321,7 +14367,8 @@ function packPageSlack(previewEl) {
       } else {
         const need = group.reduce((s, el) => s + (el.offsetHeight || 0), 0);
         if (need <= 0 || !_pageHasRoomBeforeFooter(prev, need)) {
-          if (_fillPageSlackWithProse(prev, next)) changed = true;
+          if (_fillPageSlackWithInfoTableRows(prev, next)) changed = true;
+          else if (_fillPageSlackWithProse(prev, next)) changed = true;
           continue;
         }
         group.forEach(el => prev.appendChild(el));
@@ -14329,7 +14376,10 @@ function packPageSlack(previewEl) {
       changed = true;
     }
   }
-  if (!_docFreePageLayout()) _fillLoosePageSlackWithProse(previewEl);
+  if (!_docFreePageLayout()) {
+    _fillLoosePageSlackWithInfoTables(previewEl);
+    _fillLoosePageSlackWithProse(previewEl);
+  }
   _healOrphanSectionHeads(previewEl);
   pruneEmptyPreviewPages(previewEl);
 }
@@ -14506,6 +14556,10 @@ function paginatePreview() {
 
     const PAGE_LIMIT = PAGE_CONTENT_MAX_PX + TOLERANCE_PX;
     const _pageOverflow = pg => _pageExceedsContentLimit(pg, _footerClearMm, TOLERANCE_PX);
+    /* Bottom-edge limits — matches _pageOverflow / footer guard (not sum of offsetHeights). */
+    const _pageFlowLimitPx = pg => _pageMaxContentBottomPx(pg, _footerClearMm) + TOLERANCE_PX;
+    const _pageFlowOverflow = pg => _pageContentBottomPx(pg) > _pageFlowLimitPx(pg);
+    const _pageFlowSlackPx = pg => _pageFlowLimitPx(pg) - _pageContentBottomPx(pg);
 
     // Open a fresh, measured A4 page and return it.
     const openPage = () => {
@@ -14528,8 +14582,6 @@ function paginatePreview() {
       const lead = Array.isArray(leadHeadings) ? leadHeadings.slice() : [];
       const isColValTbl = srcTable.classList && srcTable.classList.contains('apb-col-val-tbl');
       const isResFeeTbl = srcTable.classList && srcTable.classList.contains('apb-res-fee-tbl');
-      const isInfoSec12Tbl = srcTable.classList && srcTable.classList.contains('apb-info-tbl-sec12') &&
-        !isResFeeTbl && _footerClearExtraMm(currentDoc) > 0;
       const allTbodyRows = Array.from(srcTable.tBodies).flatMap(b => Array.from(b.rows));
       let dataRows = allTbodyRows;
       let footRows = [];
@@ -14588,7 +14640,7 @@ function paginatePreview() {
       if (dataRows.length === 1) {
         let { seg, tb } = mountTableStart(pg);
         tb.appendChild(dataRows[0]);
-        if (_pageContentUsedPx(pg) > PAGE_LIMIT && priorCount > 0) {
+        if (_pageFlowOverflow(pg) && priorCount > 0) {
           _unmountTableSegment(pg, seg, lead);
           _pullSectionHeadForLead(pg, lead);
           endMeasure(pg);
@@ -14601,7 +14653,7 @@ function paginatePreview() {
       }
 
       let { seg, tb } = mountTableStart(pg);
-      if (_pageContentUsedPx(pg) > PAGE_LIMIT && priorCount > 0) {
+      if (_pageFlowOverflow(pg) && priorCount > 0) {
         _unmountTableSegment(pg, seg, lead);
         _pullSectionHeadForLead(pg, lead);
         endMeasure(pg);
@@ -14610,16 +14662,17 @@ function paginatePreview() {
       }
 
       for (const row of dataRows) {
-        if ((isResFeeTbl || isInfoSec12Tbl) && tb.rows.length > 0) {
+        /* Fee tables: pre-check slack; info §I–II tables: append until real overflow only. */
+        if (isResFeeTbl && tb.rows.length > 0) {
           const rowH = row.offsetHeight || 22;
-          if (PAGE_LIMIT - _pageContentUsedPx(pg) < rowH - 1) {
+          if (_pageFlowSlackPx(pg) < rowH - 1) {
             endMeasure(pg);
             pg = openPage();
             ({ seg, tb } = mountTableStart(pg));
           }
         }
         tb.appendChild(row);
-        if (_pageContentUsedPx(pg) > PAGE_LIMIT && tb.rows.length > 1) {
+        if (_pageFlowOverflow(pg) && tb.rows.length > 1) {
           tb.removeChild(row);
           endMeasure(pg);
           pg = openPage();
