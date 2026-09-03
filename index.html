@@ -9701,6 +9701,14 @@ function buildCapacityNarrativeFromData(D) {
   }
   return finishNarrativeWithApx(parts.join(' '), D, ['pl', 'dscr']);
 }
+/** IV — ໃຊ້ຂໍ້ຄວາມຜູ້ໃຊ້ (IV.1 P&L + IV.2 DSCR) ກ່ອນ; ວ່າງຄ່ອຍ auto ຈາກຕາຕະລາງ */
+function resolveCapacityNarrative(D) {
+  const pl = String(D.res_pl_narrative || '').trim();
+  const dscr = String(D.res_dscr_narrative || '').trim();
+  if (!pl && !dscr) return buildCapacityNarrativeFromData(D);
+  const body = [pl, dscr].filter(Boolean).join(' ');
+  return finishNarrativeWithApx(body, D, ['pl', 'dscr']);
+}
 function buildColResearchTemplate(D) {
   if ((D.col_valuation_mode || 'standard') === 'project') return buildColProjectTemplate(D);
   const ref = (D.col_ref || '...').trim();
@@ -9829,7 +9837,7 @@ function fillResNarrativeFromTable(kind) {
     dep: ['res_dep_narrative', buildDepNarrative],
     usage: ['res_usage_narrative', buildUsageNarrative],
     bs: ['res_bs_narrative', buildBSNarrative],
-    pl: ['res_pl_narrative', buildCapacityNarrativeFromData],
+    pl: ['res_pl_narrative', buildPLNarrativeFromData],
     dscr: ['res_dscr_narrative', buildDSCRNarrativeFromData]
   };
   const cfg = map[kind];
@@ -10855,7 +10863,7 @@ function renderResearch(D, variant) {
 
   // IV. Capacity
   h += `<div class="apb-sec-head">IV. ຄວາມສາມາດຊຳລະ (Capacity).</div>`;
-  h += apbResNarrativeBlock(buildCapacityNarrativeFromData(D));
+  h += apbResNarrativeBlock(resolveCapacityNarrative(D));
 
   // BS + P&L + DSCR tables (legacy inline) → ເອກະສານຊ້ອນທ້າຍເທົ່ານັ້ນ
   if (false) {
