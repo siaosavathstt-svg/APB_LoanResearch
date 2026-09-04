@@ -1450,7 +1450,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
           <span id="tech_opinion_draft_status" style="font-size:11px;color:#888"></span>
           <span id="tech_opinion_polish_status" style="font-size:11px;color:#888"></span>
         </div>
-        <textarea id="tech_opinion" rows="12" placeholder="ຜ່ານການຄົ້ນຄວ້າເກັບກຳຂໍ້ມູນ...">ຜ່ານການຄົ້ນຄວ້າເກັບກຳຂໍ້ມູນຕົວຈິງ ຢູ່ສະຖານທີ່ສວນກາເຟ ແລະ ໂຮງປຸງແຕ່ງ ອີງຕາມເອກະສານທີ່ລູກຄ້າສະໜອງໃຫ້ ເຫັນວ່າ ໂຄງການຂະຫຍາຍສວນກາເຟ ແລະ ລະບົບຊົ່ມນ້ຳ ມີຄວາມຈຳເປັນ ແລະ ສອດຄ່ອງກັບມາດຕະຖານກະສິກຳກາເຟພື້ນທີ່ໂບລາເວັນ. ຖ້າດຳເນີນງານຕາມແຜນນຳໃຊ້ເງິນກູ້ ແລະ ແຜນລາຍຮັບ-ລາຍຈ່າຍ ມີຄວາມສາມາດຊຳລະໜີ້ ທສກ ໄດ້. ຫຼັກຊັບຄ້ຳປະກັນ (ທີ່ດິນ ແລະ ໂຮງຕາກ) ມີມູນຄ່າຮັບຮອງພຽງພໍຕາມລະບຽບ. ສະນັ້ນ ໃນນາມວິຊາການ ເຫັນດີສະເໜີພິຈາລະນາອະນຸມັດວົງເງິນ 5.000.000.000 ກີບ ຕາມທີ່ສະເໜີ.</textarea>
+        <textarea id="tech_opinion" rows="12" oninput="if(typeof generateDoc==='function'&&['research','chairman','chairman_vip'].includes(currentDoc))generateDoc()" placeholder="ຜ່ານການຄົ້ນຄວ້າເກັບກຳຂໍ້ມູນ...">ຜ່ານການຄົ້ນຄວ້າເກັບກຳຂໍ້ມູນຕົວຈິງ ຢູ່ສະຖານທີ່ສວນກາເຟ ແລະ ໂຮງປຸງແຕ່ງ ອີງຕາມເອກະສານທີ່ລູກຄ້າສະໜອງໃຫ້ ເຫັນວ່າ ໂຄງການຂະຫຍາຍສວນກາເຟ ແລະ ລະບົບຊົ່ມນ້ຳ ມີຄວາມຈຳເປັນ ແລະ ສອດຄ່ອງກັບມາດຕະຖານກະສິກຳກາເຟພື້ນທີ່ໂບລາເວັນ. ຖ້າດຳເນີນງານຕາມແຜນນຳໃຊ້ເງິນກູ້ ແລະ ແຜນລາຍຮັບ-ລາຍຈ່າຍ ມີຄວາມສາມາດຊຳລະໜີ້ ທສກ ໄດ້. ຫຼັກຊັບຄ້ຳປະກັນ (ທີ່ດິນ ແລະ ໂຮງຕາກ) ມີມູນຄ່າຮັບຮອງພຽງພໍຕາມລະບຽບ. ສະນັ້ນ ໃນນາມວິຊາການ ເຫັນດີສະເໜີພິຈາລະນາອະນຸມັດວົງເງິນ 5.000.000.000 ກີບ ຕາມທີ່ສະເໜີ.</textarea>
       </div>
       <div class="field" style="margin-top:10px">
         <label>ການຕັດສິນ ທສກ (XIII ສຳລັບປະທານ)</label>
@@ -9347,10 +9347,10 @@ function onResUsageDisplayChanged() {
   if (w) w.style.display = getResDisplayMode('res_usage_display') === 'text' ? '' : 'none';
   if (typeof generateDoc === 'function') generateDoc();
 }
-function apbResNarrativeBlock(text, emptyMsg) {
+function apbResNarrativeBlock(text, emptyMsg, opts) {
   const t = String(text || '').trim();
   if (!t) return `<p class="apb-opinion-para" style="text-indent:40px;color:#999;margin:6px 0">${emptyMsg || '(ບໍ່ໄດ້ປ້ອນ)'}</p>`;
-  return formatOpinionHTML(t);
+  return formatOpinionHTML(t, emptyMsg, opts);
 }
 
 /** Split opinion only at blank lines (user paragraph breaks) — no auto sentence/length split. */
@@ -9363,14 +9363,17 @@ function splitOpinionParagraphs(raw) {
   return parts.length ? parts : [t.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim()];
 }
 
-/** Render opinion as <p> per user paragraph; paginator may split long blocks by line. */
-function formatOpinionHTML(raw, emptyMsg) {
+/** Render opinion as <p> per user paragraph; paginator may split long blocks by line. opts.noSplit — keep whole block (XII tech opinion justify). */
+function formatOpinionHTML(raw, emptyMsg, opts) {
+  opts = opts || {};
   const parts = splitOpinionParagraphs(raw);
   if (!parts.length) {
     return `<p class="apb-opinion-para" style="text-indent:40px;text-align:justify;margin:6px 0;color:#999">${escapeHtml(emptyMsg || '-')}</p>`;
   }
+  const splitCls = opts.noSplit ? '' : ' apb-splittable-prose';
+  const noSplitAttr = opts.noSplit ? ' data-no-split="1"' : '';
   return parts.map((para, i) =>
-    `<p class="apb-opinion-para apb-splittable-prose apb-justify-lo" lang="lo" style="text-indent:40px;text-align:justify;margin:${i ? '0' : '6px'} 0 0;line-height:1.55">${escapeHtmlLaoJustify(para)}</p>`
+    `<p class="apb-opinion-para${splitCls} apb-justify-lo" lang="lo"${noSplitAttr} style="text-indent:40px;text-align:justify;margin:${i ? '0' : '6px'} 0 0;line-height:1.55">${escapeHtmlLaoJustify(para)}</p>`
   ).join('');
 }
 function apbAppendixHint(num) {
@@ -10688,12 +10691,13 @@ function renderResearch(D, variant) {
     );
     h += `<div class="apb-title">ໜັງສືລາຍງານ</div>
     <div class="apb-subtitle">ຂໍອະນຸມັດສິນເຊື່ອ</div>`;
-    h += `<p style="margin:8px 0 8px 20mm"><strong>ຮຽນ: ທ່ານ ປະທານສະພາບໍລິຫານ ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ, ທີ່ເຄົາລົບ ແລະ ນັບຖືຢ່າງສູງ</strong></p>`;
+    h += `<table class="apb-chair-letter-meta" style="width:calc(100% - 20mm);margin:8px 0 6px 20mm;border-collapse:collapse">
+    <tr><td style="width:62px;font-weight:700;vertical-align:top;padding:2px 0;white-space:nowrap">ຮຽນ:</td>
+        <td style="padding:2px 0;font-weight:700">ທ່ານ ປະທານສະພາບໍລິຫານ ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ, ທີ່ເຄົາລົບ ແລະ ນັບຖືຢ່າງສູງ</td></tr>`;
     const subjBiz = escapeHtml(D.biz_name || '...');
-    const subjOwner = (D.biz_owner || '').trim()
-      ? ' ' + escapeHtml(D.biz_owner.trim())
-      : '';
-    h += `<p style="margin:6px 0 6px 20mm"><strong>ເລື່ອງ: ການສະເໜີຂໍສິນເຊື່ອ ຂອງ ${subjBiz}${subjOwner ? ' ' + subjOwner : ''}.</strong></p>`;
+    h += `<tr><td style="font-weight:700;vertical-align:top;padding:2px 0;white-space:nowrap">ເລື່ອງ:</td>
+        <td style="padding:2px 0;font-weight:700">ການສະເໜີຂໍສິນເຊື່ອ ຂອງ ${subjBiz}.</td></tr>
+  </table>`;
     const resNo = escapeHtml(D.a_research_no || '...');
     const resDt = escapeHtml(D.a_research_date || '...');
     const reqRef = String(D.req_ref || '').trim();
@@ -11488,7 +11492,7 @@ function renderResearch(D, variant) {
   } else {
     h += `<div class="apb-sec-head">XII. ທັດສະນະທາງວິຊາການ.</div>`;
     h += renderVerdictCheckboxesHTML(D.tech_verdict || 'ເຫັນດີ');
-    h += formatOpinionHTML(D.tech_opinion, '-');
+    h += apbResNarrativeBlock(D.tech_opinion, '-', { noSplit: true });
   }
 
   h += `<div class="apb-sec-sub" style="margin-top:14px">1. ເງື່ອນໄຂການໃຫ້ສິນເຊື່ອ</div>`;
