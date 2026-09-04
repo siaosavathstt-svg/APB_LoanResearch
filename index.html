@@ -10691,12 +10691,12 @@ function renderResearch(D, variant) {
     );
     h += `<div class="apb-title">ໜັງສືລາຍງານ</div>
     <div class="apb-subtitle">ຂໍອະນຸມັດສິນເຊື່ອ</div>`;
-    h += `<table class="apb-chair-letter-meta" style="width:calc(100% - 20mm);margin:8px 0 6px 20mm;border-collapse:collapse">
-    <tr><td style="width:62px;font-weight:700;vertical-align:top;padding:2px 0;white-space:nowrap">ຮຽນ:</td>
-        <td style="padding:2px 0;font-weight:700">ທ່ານ ປະທານສະພາບໍລິຫານ ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ, ທີ່ເຄົາລົບ ແລະ ນັບຖືຢ່າງສູງ</td></tr>`;
+    h += `<table class="apb-chair-letter-meta" style="width:calc(100% - 20mm);margin:8px 0 8px 20mm;border-collapse:collapse;line-height:1.35">
+    <tr><td style="width:1%;font-weight:700;vertical-align:top;padding:0 4px 0 0;white-space:nowrap">ຮຽນ:</td>
+        <td style="padding:0;font-weight:700">ທ່ານ ປະທານສະພາບໍລິຫານ ທະນາຄານ ສົ່ງເສີມກະສິກຳ ຈຳກັດ, ທີ່ເຄົາລົບ ແລະ ນັບຖືຢ່າງສູງ</td></tr>`;
     const subjBiz = escapeHtml(D.biz_name || '...');
-    h += `<tr><td style="font-weight:700;vertical-align:top;padding:2px 0;white-space:nowrap">ເລື່ອງ:</td>
-        <td style="padding:2px 0;font-weight:700">ການສະເໜີຂໍສິນເຊື່ອ ຂອງ ${subjBiz}.</td></tr>
+    h += `<tr><td style="width:1%;font-weight:700;vertical-align:top;padding:0 4px 0 0;white-space:nowrap">ເລື່ອງ:</td>
+        <td style="padding:0;font-weight:700">ການສະເໜີຂໍສິນເຊື່ອ ຂອງ ${subjBiz}.</td></tr>
   </table>`;
     const resNo = escapeHtml(D.a_research_no || '...');
     const resDt = escapeHtml(D.a_research_date || '...');
