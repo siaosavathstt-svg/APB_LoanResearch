@@ -2453,6 +2453,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
       line-height: 1.35;
       color: #333;
     }
+    .apb-apx-line-footer.apb-apx-line-footer--multi { white-space: normal; text-align: left; }
     .apb-apx-line-footer .pdf-foot-company { font-weight: 700; }
     .apb-apx-line-footer .pdf-foot-sep { color: #bbb; margin: 0 5px; }
     /* ── ປົກສຳນວນອະນຸມັts (A4 ເຕັມ — ພື້ນຫຼັງ loan_copy_bg, ບໍ່ມີຈຸດ grid) ── */
@@ -2731,6 +2732,64 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
       font-weight: 500;
       color: #444;
       margin-left: 8px;
+    }
+    /* ຟຸດເຕິຫຼາຍສະກຸນ — ແບບ B, grid: ເນື້ອຫາ | ໂຊນເລກໜ້າ (margin ຂວາ) */
+    .apb-pdf-footer.apb-pdf-footer--multi {
+      white-space: normal;
+      overflow: visible;
+      line-height: 1.3;
+      align-items: stretch !important;
+      justify-content: flex-start !important;
+      text-align: left !important;
+    }
+    .apb-pdf-footer--multi .pdf-foot-inner {
+      display: flex !important;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100% !important;
+      max-width: 100% !important;
+      white-space: normal;
+      overflow: visible;
+      justify-content: flex-start;
+    }
+    .pdf-foot-multi-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 14mm;
+      width: 100%;
+      column-gap: 2mm;
+      align-items: start;
+    }
+    .pdf-foot-multi-wrap--no-page {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pdf-foot-row-flow {
+      grid-column: 1;
+      text-align: left;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      min-width: 0;
+      font-weight: 600;
+    }
+    .apb-pdf-footer--multi .pdf-foot-company,
+    .apb-apx-line-footer--multi .pdf-foot-company {
+      font-weight: 700;
+      white-space: normal;
+    }
+    .apb-pdf-footer--multi .pdf-foot-pages {
+      grid-column: 2;
+      grid-row: 1;
+      text-align: right;
+      white-space: nowrap;
+      align-self: start;
+      font-weight: 500;
+      color: #444;
+      position: static;
+      margin: 0;
+    }
+    .apb-apx-line-footer.apb-apx-line-footer--multi {
+      white-space: normal;
+      text-align: left;
     }
 
     /* Hide the legacy .apb-footer (rendered at end of doc by apbFooter()). The
@@ -8459,7 +8518,7 @@ function restoreBSDynamicData(raw) {
 }
 function calcBS() {
   const setVal = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
-  const sumRows = (rows, yKey) => rows.reduce((s,r) => s + (parseFloat(r[yKey])||0), 0);
+  const sumRows = (rows, yKey) => rows.reduce((s, r) => s + (r.deleted ? 0 : (parseFloat(r[yKey]) || 0)), 0);
   const curRows = getBSSectionRows('asset_cur');
   const fixRows = getBSSectionRows('asset_fix');
   const stRows = getBSSectionRows('liab_st');
@@ -9886,28 +9945,11 @@ function apbFooter(D = {}, docType = '') {
 /** ຟຸດເຕີແຖວດຽວກັບ preview ບົດຄົ້ນຄວ້າ — ໃຊ້ໃນເອກະສານຄັດຕິດເທົ່ານັ້ນ */
 function buildApbLineFooterHTML(D) {
   D = D || {};
-  const companyName = escapeHtml(String(D.biz_name || D.company || '').trim() || '—');
-  const fAmount = parseFloat(D.ap_amount || D.amount) || 0;
-  const fCurrency = String(D.ap_currency || D.currency || 'ກີບ').trim();
-  const fTermRaw = String(D.ap_term ?? D.term ?? '').trim();
-  const ratePlain = getFooterRatePlain(D);
-  const amountStr = fAmount > 0 ? `${fmtN(fAmount)} ${escapeHtml(fCurrency)}` : '—';
-  const rateStr = escapeHtml(ratePlain);
-  const termStr = fTermRaw ? `${escapeHtml(fTermRaw)} ເດືອນ` : '—';
-  const companyRaw = String(D.biz_name || D.company || '').trim() || '—';
-  const amountPlain = fAmount > 0 ? `${fmtN(fAmount)} ${fCurrency}` : '—';
-  const termPlain = fTermRaw ? `${fTermRaw} ເດືອນ` : '—';
-  const footerTextString = `${companyRaw} | ວົງເງິນ: ${amountPlain} | ດອກເບ້ຍ: ${ratePlain} | ໄລຍະເວລາ: ${termPlain}`;
-  const fs = typeof calcFooterFontSize === 'function' ? calcFooterFontSize(footerTextString.length) : '9pt';
-  return `<div class="apb-apx-line-footer" style="font-size:${fs}">` +
-    `<span class="pdf-foot-company">${companyName}</span>` +
-    `<span class="pdf-foot-sep">|</span>` +
-    `<span class="pdf-foot-meta"><b>ວົງເງິນ:</b> ${amountStr}</span>` +
-    `<span class="pdf-foot-sep">|</span>` +
-    `<span class="pdf-foot-meta"><b>ດອກເບ້ຍ:</b> ${rateStr}</span>` +
-    `<span class="pdf-foot-sep">|</span>` +
-    `<span class="pdf-foot-meta"><b>ໄລຍະເວລາ:</b> ${termStr}</span>` +
-    `</div>`;
+  const meta = buildFooterMeta(D);
+  const fsInfo = calcFooterFontSizeForMeta(meta);
+  const multiCls = meta.multiRow ? ' apb-apx-line-footer--multi' : '';
+  const styleAttr = meta.multiRow ? '' : ` style="font-size:${fsInfo.main}"`;
+  return `<div class="apb-apx-line-footer${multiCls}"${styleAttr}>${buildFooterLineHTML(meta)}</div>`;
 }
 
 /** ຫົວເອກະສານຄັດຕິດ — ຄຳຂັວນ + ຊື່ບໍລິສັດ + ເລກຄັດຕິດ + ຫົວຂໍ້ (ບໍ່ມີ ທີ່/ວັນທີ/ຫົວໜ່ວຍ) */
@@ -9957,6 +9999,114 @@ function getApproveTranchesForRender(D) {
     repay_src:  D.repay_src || 'ຈາກການດຳເນີນທຸລະກິດ',
     nperiod:    parseInt(D.ap_num_periods || '5') || 5
   }];
+}
+
+/** ຟຸດເຕິ — 1 ສະກຸນ: ແຖວດຽວ; ຫຼາຍສະກຸນ: ແບບ B (ຄື _loanDetail ລາຍງານປະທານ), ຕົກແຖວໄດ້ */
+function buildFooterMeta(D, opt) {
+  D = D || {};
+  opt = opt || {};
+  const _esc = typeof opt.escapeFn === 'function' ? opt.escapeFn
+    : (s => (typeof escapeHtml === 'function' ? escapeHtml(String(s)) : String(s)));
+  const _fmtN = typeof fmtN === 'function' ? fmtN : (n => Number(n).toLocaleString());
+  const companyRaw = String(D.biz_name || D.company || opt.companyFallback || '').trim() || '—';
+  const companyName = _esc(companyRaw);
+  const customRate = String(D.foot_rate || opt.foot_rate || '').trim();
+  const rows = typeof getApproveTranchesForRender === 'function' ? getApproveTranchesForRender(D) : [];
+
+  if (rows.length <= 1) {
+    const r0 = rows[0] || {};
+    const fAmount = parseFloat(r0.amount ?? D.ap_amount ?? D.amount) || 0;
+    const fCurrency = String(r0.currency || D.ap_currency || D.currency || 'ກີບ').trim();
+    const fTermRaw = String(r0.term ?? D.ap_term ?? D.term ?? '').trim();
+    const ratePlain = customRate || (() => {
+      const rp = fmtRatePct(r0.rate ?? D.ap_rate ?? D.rate ?? '');
+      return rp !== '—' ? rp + '%' : '—';
+    })();
+    const amountStr = fAmount > 0 ? `${_fmtN(fAmount)} ${_esc(fCurrency)}` : '—';
+    const amountPlain = fAmount > 0 ? `${_fmtN(fAmount)} ${fCurrency}` : '—';
+    const termPlain = fTermRaw ? `${fTermRaw} ເດືອນ` : '—';
+    return {
+      companyName, companyRaw,
+      multiRow: false,
+      amountStr,
+      rateStr: _esc(ratePlain),
+      termStr: fTermRaw ? `${_esc(fTermRaw)} ເດືອນ` : '—',
+      footerTextString: `${companyRaw} | ວົງເງິນ: ${amountPlain} | ດອກເບ້ຍ: ${ratePlain} | ໄລຍະເວລາ: ${termPlain}`,
+      showRate: true,
+      showTerm: true
+    };
+  }
+
+  const partPlain = r => {
+    const rp = fmtRatePct(r.rate);
+    const ratePct = rp !== '—' ? rp + '%' : '—';
+    const t = String(r.term ?? '').trim() || '-';
+    return `${_fmtN(r.amount)} ${r.currency || 'ກີບ'} (ອັດຕາດອກເບ້ຍ ${ratePct}, ໄລຍະເວລາ ${t} ເດືອນ)`;
+  };
+  const partHtml = r => {
+    const rp = fmtRatePct(r.rate);
+    const ratePct = rp !== '—' ? rp + '%' : '—';
+    const t = String(r.term ?? '').trim() || '-';
+    return `${_fmtN(r.amount)} ${_esc(r.currency || 'ກີບ')} (ອັດຕາດອກເບ້ຍ ${_esc(ratePct)}, ໄລຍະເວລາ ${_esc(t)} ເດືອນ)`;
+  };
+  const partsPlain = rows.map(partPlain);
+  const partsHtml = rows.map(partHtml);
+  const loanDetailPlain = 'ວົງເງິນ ' + partsPlain.join(' ແລະ ');
+  const loanDetailStr = 'ວົງເງິນ ' + partsHtml.join(' ແລະ ');
+  const fullBlockPlain = `${companyRaw} ${loanDetailPlain}`;
+  const fullBlockStr = `${companyName} ${loanDetailStr}`;
+  return {
+    companyName, companyRaw,
+    multiRow: true,
+    currencyCount: rows.length,
+    loanDetailStr,
+    loanDetailPlain,
+    fullBlockStr,
+    fullBlockPlain,
+    footerTextString: fullBlockPlain
+  };
+}
+
+function calcFooterFontSizeForMeta(meta) {
+  meta = meta || {};
+  if (!meta.multiRow) {
+    return { multi: false, main: calcFooterFontSize(meta.footerTextString.length) };
+  }
+  const n = Number((meta.fullBlockPlain || meta.loanDetailPlain || meta.footerTextString || '').length) || 0;
+  const cnt = Number(meta.currencyCount) || 2;
+  let size = '8.5pt';
+  if (n > 100 || cnt >= 3) size = '8pt';
+  if (n > 160 || cnt >= 4) size = '7.5pt';
+  return { multi: true, head: size, body: size };
+}
+
+function buildFooterLineHTML(meta, pageStr) {
+  meta = meta || {};
+  if (meta.multiRow) {
+    const fs = calcFooterFontSizeForMeta(meta);
+    const size = fs.head || fs.body || '8pt';
+    const noPageCls = pageStr ? '' : ' pdf-foot-multi-wrap--no-page';
+    let html = `<div class="pdf-foot-multi-wrap${noPageCls}" style="font-size:${size}">` +
+      `<div class="pdf-foot-row-flow">` +
+      `<span class="pdf-foot-company">${meta.companyName || '—'}</span> ${meta.loanDetailStr || '—'}` +
+      `</div>`;
+    if (pageStr) html += `<span class="pdf-foot-pages">${pageStr}</span>`;
+    html += `</div>`;
+    return html;
+  }
+  let html =
+    `<span class="pdf-foot-company">${meta.companyName || '—'}</span>` +
+    `<span class="pdf-foot-sep">|</span>` +
+    `<span class="pdf-foot-meta"><b>ວົງເງິນ:</b> ${meta.amountStr || '—'}</span>`;
+  if (meta.showRate && meta.rateStr) {
+    html += `<span class="pdf-foot-sep">|</span>` +
+      `<span class="pdf-foot-meta"><b>ດອກເບ້ຍ:</b> ${meta.rateStr}</span>`;
+  }
+  if (meta.showTerm && meta.termStr) {
+    html += `<span class="pdf-foot-sep">|</span>` +
+      `<span class="pdf-foot-meta"><b>ໄລຍະເວລາ:</b> ${meta.termStr}</span>`;
+  }
+  return html;
 }
 
 /** ວົງເງິນອະນຸມັດເກີນ 5 ຕື້ (logic ດຽວກັບໜັງສືແຈ້ງຜົນ) */
@@ -10298,7 +10448,7 @@ function renderApprovalByCurrencySections(D, rows, baseNo, docType) {
       block += renderDocRepayScheduleBlock(D, repayRows, curr);
     }
     block += '<div style="margin:8px 0 4px 22px;font-weight:700">- ຄ່າທຳນຽມ</div>' +
-      '<div style="margin:6px 0 4px 22px;max-width:640px">' + renderApbInfoTblSec12Rows(buildResearchDocFeeRows(D, r), '•', 'width:100%', true) + '</div>';
+      '<div style="margin:6px 0 4px 22px;max-width:640px">' + renderApbInfoTblSec12Rows(buildResearchDocFeeRows(D, r, { includeResearchFee: !multiCurr || i === 0 }), '•', 'width:100%', true) + '</div>';
     out += block;
   });
 
@@ -11998,6 +12148,12 @@ body{font-family:'Phetsarath OT','Noto Serif Lao',serif;font-size:12pt;margin:0;
 .apb-appendix-sheet{display:flex;flex-direction:column;min-height:${sheetMinH};page-break-after:always;break-after:page;padding:1cm;box-sizing:border-box;}
 .apb-apx-hdr{font-family:'Phetsarath OT','Noto Serif Lao',serif;margin-bottom:4px;}
 .apb-apx-line-footer{margin-top:auto;padding-top:8px;border-top:1.5px solid #006b6b;text-align:center;white-space:nowrap;font-family:'Phetsarath OT','Noto Serif Lao',serif;line-height:1.35;color:#333;}
+.apb-apx-line-footer.apb-apx-line-footer--multi{white-space:normal;text-align:left;}
+.pdf-foot-multi-wrap{display:grid;grid-template-columns:minmax(0,1fr) 14mm;width:100%;column-gap:2mm;align-items:start;}
+.pdf-foot-multi-wrap--no-page{grid-template-columns:minmax(0,1fr);}
+.pdf-foot-row-flow{grid-column:1;text-align:left;white-space:normal;word-wrap:break-word;overflow-wrap:break-word;min-width:0;font-weight:600;}
+.apb-apx-line-footer--multi .pdf-foot-company{font-weight:700;white-space:normal;}
+.apb-pdf-footer--multi .pdf-foot-pages{grid-column:2;grid-row:1;text-align:right;white-space:nowrap;align-self:start;font-weight:500;color:#444;}
 .apb-apx-line-footer .pdf-foot-company{font-weight:700;}
 .apb-apx-line-footer .pdf-foot-sep{color:#bbb;margin:0 5px;}
 .apb-apx-line-footer .pdf-foot-meta{font-weight:600;color:#333;}
@@ -13129,12 +13285,16 @@ function pushResolutionDetailFeeRows(rows, feeBr, D, opts) {
   }
 }
 
-function buildResearchDocFeeRows(D, r) {
+function buildResearchDocFeeRows(D, r, opt) {
+  opt = opt || {};
   const feeMode = D.res_fee_mode || 'detail';
   if (feeMode === 'regulation') {
     return [['ຄ່າທຳນຽມ ແລະ ຄ່າບໍລິການ', 'ປະຕິບັດຕາມລະບຽບການຂອງ ທສກ']];
   }
-  const rows = [['ຄ່າທຳນຽມຄົ້ນຄວ້າເອກະສານ', feeAmtCell(fmtN(D.fee_research), 'ກີບ')]];
+  const rows = [];
+  if (opt.includeResearchFee !== false) {
+    rows.push(['ຄ່າທຳນຽມຄົ້ນຄວ້າເອກະສານ', feeAmtCell(fmtN(D.fee_research), 'ກີບ')]);
+  }
   const feeBr = r ? getTrancheApprovalFeeBreakdown(D, r) : getSingleTrancheApprovalFeeBreakdown(D);
   pushResolutionDetailFeeRows(rows, feeBr, D, { aligned: true });
   return rows;
@@ -13724,20 +13884,27 @@ function generateDoc() {
 // Dynamic footer font-size from combined plain-text length (company + amount + rate + term).
 function calcFooterFontSize(totalLength) {
   const n = Number(totalLength) || 0;
-  if (n < 80) return '10pt';
-  if (n <= 120) return '9pt';
-  return '7.5pt';
+  if (n < 80) return '10.5pt';
+  if (n <= 120) return '9.5pt';
+  return '8pt';
 }
 
 /** Per-page footer: ແຖວຂໍ້ມູນ + ໜ້າ X/Y; ຮູບ APB ສະເພາະໜ້າທຳອິດ. */
-function buildPageFooterHtml(pageNum, total, footerLineHTML, dynamicFontSize) {
+function buildPageFooterHtml(pageNum, total, footerMeta) {
+  footerMeta = footerMeta || {};
   const pageStr = `ໜ້າ ${pageNum} / ${total}`;
+  const fsInfo = calcFooterFontSizeForMeta(footerMeta);
+  const multiClass = footerMeta.multiRow ? ' apb-pdf-footer--multi' : '';
+  const inlineStyle = footerMeta.multiRow ? '' : ` style="font-size:${fsInfo.main}"`;
+  const inner = footerMeta.multiRow
+    ? buildFooterLineHTML(footerMeta, pageStr)
+    : buildFooterLineHTML(footerMeta) + `<span class="pdf-foot-pages">${pageStr}</span>`;
   const imgHtml = (pageNum === 1 && typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG)
     ? `<div class="apb-footer-wrap"><img src="${APB_FOOTER_IMG}" alt="APB Footer"></div>`
     : '';
   const metaRow =
-    `<div class="apb-pdf-footer" style="font-size:${dynamicFontSize}">` +
-      `<div class="pdf-foot-inner">${footerLineHTML}<span class="pdf-foot-pages">${pageStr}</span></div>` +
+    `<div class="apb-pdf-footer${multiClass}"${inlineStyle}>` +
+      `<div class="pdf-foot-inner">${inner}</div>` +
     `</div>`;
   if (!imgHtml) return metaRow;
   return `<div class="apb-page-bottom">${metaRow}${imgHtml}</div>`;
@@ -14814,10 +14981,6 @@ function paginatePreview() {
 
   // Pad: T20 R20 B25 L25 (mm). Limit = printable body height (not full 297mm box).
   const skipPdfFooter = typeof docSkipsPdfFooter === 'function' && docSkipsPdfFooter(currentDoc);
-  const _footerClearMm = _docFooterClearMm(currentDoc);
-  const PAGE_CONTENT_MAX_PX = _pageContentLimitPx(_footerClearMm);
-  const TOLERANCE_PX = 2;
-
   const originalChildren = getPrintableChildren(previewEl);
   if (!originalChildren.length) return;
 
@@ -14825,37 +14988,19 @@ function paginatePreview() {
   const _esc = s => String(s || '').replace(/[&<>"']/g, c =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const _val = id => (document.getElementById(id)?.value || '').trim();
-  const _fmtN = (typeof fmtN === 'function')
-    ? fmtN
-    : (n => Number(n).toLocaleString());
 
-  const companyName = _esc((D.biz_name || D.company || _val('f_company') || '').trim() || '—');
-  const fAmount   = parseFloat(D.ap_amount || D.amount || _val('f_amount')) || 0;
-  const fCurrency = String(D.ap_currency || D.currency || _val('f_currency') || 'ກີບ').trim();
-  const fTermRaw  = String(D.ap_term ?? D.term ?? _val('f_term') ?? '').trim();
-  const ratePlain = typeof getFooterRatePlain === 'function'
-    ? getFooterRatePlain({ ...D, foot_rate: D.foot_rate || _val('foot_rate') })
-    : (() => { const r = fmtRatePct(D.ap_rate ?? D.rate ?? _val('f_rate') ?? ''); return r !== '—' ? r + '%' : '—'; })();
-
-  const amountStr = fAmount > 0 ? `${_fmtN(fAmount)} ${_esc(fCurrency)}` : '—';
-  const rateStr   = _esc(ratePlain);
-  const termStr   = fTermRaw ? `${_esc(fTermRaw)} ເດືອນ` : '—';
-
-  const companyRaw = (D.biz_name || D.company || _val('f_company') || '').trim() || '—';
-  const amountPlain = fAmount > 0 ? `${_fmtN(fAmount)} ${fCurrency}` : '—';
-  const termPlain   = fTermRaw ? `${fTermRaw} ເດືອນ` : '—';
-  const footerTextString =
-    `${companyRaw} | ວົງເງິນ: ${amountPlain} | ດອກເບ້ຍ: ${ratePlain} | ໄລຍະເວລາ: ${termPlain}`;
-  const dynamicFontSize = calcFooterFontSize(footerTextString.length);
-
-  const footerLineHTML =
-    `<span class="pdf-foot-company">${companyName}</span>` +
-    `<span class="pdf-foot-sep">|</span>` +
-    `<span class="pdf-foot-meta"><b>ວົງເງິນ:</b> ${amountStr}</span>` +
-    `<span class="pdf-foot-sep">|</span>` +
-    `<span class="pdf-foot-meta"><b>ດອກເບ້ຍ:</b> ${rateStr}</span>` +
-    `<span class="pdf-foot-sep">|</span>` +
-    `<span class="pdf-foot-meta"><b>ໄລຍະເວລາ:</b> ${termStr}</span>`;
+  const footerMeta = typeof buildFooterMeta === 'function'
+    ? buildFooterMeta(
+        { ...D, foot_rate: D.foot_rate || _val('foot_rate') },
+        { escapeFn: _esc, companyFallback: _val('f_company') }
+      )
+    : null;
+  const _multiFooterExtraMm = (footerMeta && footerMeta.multiRow)
+    ? Math.min(12, 5 + Math.ceil(((footerMeta.fullBlockPlain || footerMeta.loanDetailPlain || '').length) / 70))
+    : 0;
+  const _footerClearMm = _docFooterClearMm(currentDoc) + _multiFooterExtraMm;
+  const PAGE_CONTENT_MAX_PX = _pageContentLimitPx(_footerClearMm);
+  const TOLERANCE_PX = 2;
 
   const _backup = previewEl.innerHTML;
   try {
@@ -15281,7 +15426,7 @@ function paginatePreview() {
     let total = pages.length;
     if (!skipPdfFooter) {
       pages.forEach((p, i) => {
-        const footerHtml = buildPageFooterHtml(i + 1, total, footerLineHTML, dynamicFontSize);
+        const footerHtml = buildPageFooterHtml(i + 1, total, footerMeta);
         const showFooterImg = i === 0 && typeof APB_FOOTER_IMG !== 'undefined' && APB_FOOTER_IMG;
         if (showFooterImg) p.classList.add('has-apb-footer-img');
         else p.classList.remove('has-apb-footer-img');
@@ -16390,6 +16535,58 @@ function getPaginatedExportCss() {
       font-weight: 500;
       color: #444;
       margin-left: 8px;
+    }
+    .apb-pdf-footer.apb-pdf-footer--multi {
+      white-space: normal;
+      overflow: visible;
+      line-height: 1.3;
+      align-items: stretch !important;
+      justify-content: flex-start !important;
+      text-align: left !important;
+    }
+    .apb-pdf-footer--multi .pdf-foot-inner {
+      display: flex !important;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100% !important;
+      max-width: 100% !important;
+      white-space: normal;
+      overflow: visible;
+      justify-content: flex-start;
+    }
+    .pdf-foot-multi-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 14mm;
+      width: 100%;
+      column-gap: 2mm;
+      align-items: start;
+    }
+    .pdf-foot-multi-wrap--no-page {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pdf-foot-row-flow {
+      grid-column: 1;
+      text-align: left;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      min-width: 0;
+      font-weight: 600;
+    }
+    .apb-pdf-footer--multi .pdf-foot-company {
+      font-weight: 700;
+      white-space: normal;
+    }
+    .apb-pdf-footer--multi .pdf-foot-pages {
+      grid-column: 2;
+      grid-row: 1;
+      text-align: right;
+      white-space: nowrap;
+      align-self: start;
+      font-weight: 500;
+      color: #444;
+      position: static;
+      margin: 0;
     }
     .apb-footer { display: none !important; }
     .apb-letterhead-zone {
