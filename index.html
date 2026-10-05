@@ -1560,7 +1560,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
               <td><input type="text" id="ap_amount_text" value="ຫ້າຕື້" readonly class="mono"></td>
               <td><input type="number" id="ap_term" value="72" class="mono apr-term" oninput="rebuildRepay()"></td>
               <td><input type="text" id="ap_int_method" value="1 ເດືອນ/ຄັ້ງ" class="apr-intmeth"></td>
-              <td><select id="ap_loan_form" class="apr-loanform"><option value="ເງິນກູ້ເປັນບ້ວງ">ເງິນກູ້ເປັນບ້ວງ</option><option value="ເງິນກູ້ Term Loan">Term Loan</option><option value="OD">OD</option><option value="ອື່ນໆ">ອື່ນໆ</option></select></td>
+              <td><select id="ap_loan_form" class="apr-loanform"><option value="ເງິນກູ້ເປັນບ້ວງ">ເງິນກູ້ເປັນບ້ວງ</option><option value="ເງິນກູ້ Term Loan">Term Loan</option><option value="OD">OD</option><option value="ເງິນກູ້ໝູນວຽນ">ເງິນກູ້ໝູນວຽນ</option><option value="ອື່ນໆ">ອື່ນໆ</option></select></td>
               <td><input type="text" id="ap_repay_src" value="ຈາກການດຳເນີນທຸລະກິດ" class="apr-repaysrc"></td>
               <td><input type="number" id="ap_num_periods" value="5" class="mono apr-nperiod" oninput="rebuildRepay()"></td>
               <td style="color:#bbb;font-size:12px;text-align:center">●</td>
@@ -4836,7 +4836,7 @@ function addApproveTrancheRow() {
     <td><input type="text" readonly class="mono apr-txt" value=""></td>
     <td><input type="number" class="mono apr-term" value="${baseTerm}" oninput="rebuildRepay()"></td>
     <td><input type="text" class="apr-intmeth" value="${baseIntMeth}"></td>
-    <td><select class="apr-loanform"><option value="ເງິນກູ້ເປັນບ້ວງ">ເງິນກູ້ເປັນບ້ວງ</option><option value="ເງິນກູ້ Term Loan">Term Loan</option><option value="OD">OD</option><option value="ອື່ນໆ">ອື່ນໆ</option></select></td>
+    <td><select class="apr-loanform"><option value="ເງິນກູ້ເປັນບ້ວງ">ເງິນກູ້ເປັນບ້ວງ</option><option value="ເງິນກູ້ Term Loan">Term Loan</option><option value="OD">OD</option><option value="ເງິນກູ້ໝູນວຽນ">ເງິນກູ້ໝູນວຽນ</option><option value="ອື່ນໆ">ອື່ນໆ</option></select></td>
     <td><input type="text" class="apr-repaysrc" value="${baseRepSrc}"></td>
     <td><input type="number" class="mono apr-nperiod" value="5" oninput="rebuildRepay()"></td>
     <td><button type="button" class="del-btn" onclick="delTrancheRow('approve_tranches_body',this)">✕</button></td>`;
