@@ -903,11 +903,13 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
       <div class="info-note">ℹ️ 7 ປີ (1 ປີຜ່ານມາ + 6 ປີຄາດເນ) — ມີ 7 ໝວດ: I.ລາຍຮັບ / II.ລາຍຈ່າຍ / III.ກຳໄລລວມ / IV.ລາຍຈ່າຍບໍລິຫານ / V.ກຳໄລກ່ອນອາກອນ / VI.ອາກອນ / VII.ກຳໄລສຸດທິ</div>
       <div class="info-note" style="margin-top:6px">⌨️ <strong>Excel:</strong> ລູກສອນ ↑↓←→ · Tab · Enter — P&L ຂ້າມ I→II→IV · ຖານະການເງິນ · DSCR · ແຜນນຳໃຊ້ (ຂ້າມຊ່ອງ readonly ອັດຕະໂນມັດ)</div>
       <div style="margin:8px 0 12px;padding:8px 10px;border:1px solid #b8d4ea;background:#f3f9ff;border-radius:8px">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;align-items:end">
-          <div class="field" style="margin:0"><label>ສະກຸນສະແດງ</label><select id="pl_quick_to_currency"><option value="ກີບ" selected>ກີບ</option><option value="ໂດລາ">ໂດລາ</option><option value="ບາດ">ບາດ</option></select></div>
+        <div class="info-note" style="margin:0 0 8px;font-size:11px">💱 ປ້ອນຂໍ້ມູນເປັນ <strong>ສະກຸນຂໍ້ມູນ (From)</strong> ແລ້ວເລືອກ <strong>ສະກຸນສະແດງ (To)</strong> ເຊັ່ນ ໂດລາ→ກີບ ເມື່ອສະເໜີ USD ແຕ່ປ່ອຍເປັນກີບ</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;align-items:end">
+          <div class="field" style="margin:0"><label>ສະກຸນຂໍ້ມູນ (From)</label><select id="pl_quick_from_currency"><option value="ກີບ" selected>ກີບ</option><option value="ໂດລາ">ໂດລາ</option><option value="ບາດ">ບາດ</option></select></div>
+          <div class="field" style="margin:0"><label>ສະກຸນສະແດງ (To)</label><select id="pl_quick_to_currency"><option value="ກີບ" selected>ກີບ</option><option value="ໂດລາ">ໂດລາ</option><option value="ບາດ">ບາດ</option></select></div>
           <div class="field" style="margin:0"><label>THB→LAK</label><input type="number" id="pl_quick_thb_rate" class="mono" value="646" step="0.01"></div>
           <div class="field" style="margin:0"><label>USD→LAK</label><input type="number" id="pl_quick_usd_rate" class="mono" value="21688" step="0.01"></div>
-          <div><button type="button" class="add-row-btn" style="margin:0;width:auto;background:#1a5276;color:#fff;border:none" onclick="quickConvertCurrencyFromPanel('pl')">🔁 ໂຄເວີຕາຕະລາງ</button></div>
+          <div><button type="button" class="add-row-btn" style="margin:0;width:auto;background:#1a5276;color:#fff;border:none" onclick="quickConvertCurrencyFromPanel('pl')">🔁 ໂຄເວີ P&amp;L</button></div>
         </div>
       </div>
 
@@ -3187,7 +3189,36 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     }
     .apb-explain-block strong { font-family: 'Phetsarath OT', 'Noto Serif Lao', serif; }
     .apb-explain-en {
-      font-family: 'Times New Roman', serif;
+      font-family: 'Times New Roman', serif !important;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ຕົວເລກ/ອັງກິດ — Times New Roman ທົ່ວ preview/print (override .doc-wrap Phetsarath) */
+    .doc-wrap .apb-explain-en,
+    .preview-a4-page .apb-explain-en,
+    .doc-wrap .c-num, .doc-wrap .c-pct, .doc-wrap .c-date, .doc-wrap .c-fit,
+    .preview-a4-page .c-num, .preview-a4-page .c-pct, .preview-a4-page .c-date, .preview-a4-page .c-fit,
+    .doc-wrap .fee-amt-num, .preview-a4-page .fee-amt-num,
+    .doc-wrap .apb-cs-latin, .doc-wrap .cs-latin, .doc-wrap .cs-value, .doc-wrap .cs-score,
+    .preview-a4-page .apb-cs-latin, .preview-a4-page .cs-latin, .preview-a4-page .cs-value, .preview-a4-page .cs-score,
+    .doc-wrap .apb-tbl-unit, .preview-a4-page .apb-tbl-unit,
+    .doc-wrap .pdf-foot-meta, .preview-a4-page .pdf-foot-meta,
+    .doc-wrap .apb-pdf-footer-page, .preview-a4-page .apb-pdf-footer-page,
+    .doc-wrap .apb-data-tbl td[style*="text-align:right"],
+    .doc-wrap .apb-data-tbl th[style*="text-align:right"],
+    .preview-a4-page .apb-data-tbl td[style*="text-align:right"],
+    .preview-a4-page .apb-data-tbl th[style*="text-align:right"],
+    .doc-wrap .a4-page table td[style*="text-align:right"],
+    .doc-wrap .a4-page table th[style*="text-align:right"],
+    .preview-a4-page table td[style*="text-align:right"],
+    .preview-a4-page table th[style*="text-align:right"],
+    .doc-wrap .apb-appendix-tbl td[style*="text-align:right"],
+    .doc-wrap .apb-appendix-tbl th[style*="text-align:right"],
+    .doc-wrap .apb-data-tbl.tight-num td[style*="text-align:center"],
+    .doc-wrap .apb-data-tbl.tight-num th[style*="text-align:center"],
+    .preview-a4-page .apb-data-tbl.tight-num td[style*="text-align:center"],
+    .preview-a4-page .apb-data-tbl.tight-num th[style*="text-align:center"] {
+      font-family: 'Times New Roman', serif !important;
       font-variant-numeric: tabular-nums;
     }
 
@@ -3553,7 +3584,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     .apb-usage-apx-tbl .c-pct {
       white-space: nowrap;
       text-align: center;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Times New Roman', serif !important;
       font-variant-numeric: tabular-nums;
       padding-left: 3px;
       padding-right: 3px;
@@ -3585,7 +3616,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     .apb-data-tbl th[style*="text-align:right"] {
       white-space: nowrap !important;
       font-variant-numeric: tabular-nums;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Times New Roman', serif !important;
     }
     .apb-data-tbl.tight-num th,
     .apb-data-tbl.tight-num td {
@@ -3601,7 +3632,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     .apb-data-tbl.tight-num th[style*="text-align:center"] {
       white-space: nowrap !important;
       font-size: 7.2pt !important;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Times New Roman', serif !important;
       font-variant-numeric: tabular-nums;
     }
     /* V. ຫຼັກຊັບຄ້ຳປະກັນ — ຟ້ອນເທົ່າກັນ ແລະ ບໍ່ໃຫ້ລົ້ນກອບ */
@@ -3681,7 +3712,7 @@ body { font-family: 'Noto Sans Lao', sans-serif; background: var(--cream); color
     .apb-data-tbl.tight-num th[style*="text-align:center"] {
       white-space: nowrap !important;
       font-size: 7.2pt !important;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Times New Roman', serif !important;
       font-variant-numeric: tabular-nums;
     }
     .apb-col-fit-tbl th,
@@ -5156,9 +5187,26 @@ document.addEventListener('DOMContentLoaded', () => {
     fCurr.addEventListener('change', () => {
       apCurr.value = fCurr.value;
       if (usageCurr && !usageCurr.dataset.manual) usageCurr.value = fCurr.value;
+      const plFrom = document.getElementById('pl_quick_from_currency');
+      if (plFrom && !plFrom.dataset.manual) plFrom.value = fCurr.value;
       if (typeof calcApprFees==='function') calcApprFees();
       if (typeof rebuildRepay==='function') rebuildRepay();
       if (typeof syncConvertPanelWithLoanCurrency === 'function') syncConvertPanelWithLoanCurrency(false);
+    });
+  }
+  const plFrom = document.getElementById('pl_quick_from_currency');
+  const plTo = document.getElementById('pl_quick_to_currency');
+  if (plFrom) {
+    plFrom.addEventListener('change', () => { plFrom.dataset.manual = '1'; });
+    if (!plFrom.dataset.manual && fCurr?.value) plFrom.value = fCurr.value;
+  }
+  if (plTo) {
+    plTo.addEventListener('change', () => { plTo.dataset.manual = '1'; });
+    if (!plTo.dataset.manual && typeof getPrimaryLoanCurrency === 'function') plTo.value = getPrimaryLoanCurrency();
+  }
+  if (apCurr) {
+    apCurr.addEventListener('change', () => {
+      if (plTo && !plTo.dataset.manual) plTo.value = apCurr.value;
     });
   }
   if (usageCurr) {
@@ -13848,6 +13896,7 @@ function generateDoc() {
     normalizeLetterheadLayout(previewEl);
     normalizeNoColumnWidths(previewEl);
     fitAutoWidthTables(previewEl);
+    try { stampDocLatinNumFonts(previewEl); } catch (e) { console.warn('[latinNumFont]', e); }
     window._docData = D;
     // ── Snapshot ORIGINAL (un-paginated) HTML for print/PDF/Word exports ──
     // (Print/download functions use this to avoid .a4-sheet wrappers.)
@@ -15721,6 +15770,7 @@ function rebuildPreviewLayout() {
   _saveLayoutScrollBeforeRebuild(pv);
   pv.classList.remove('paginated-mode', 'appendix-mode');
   pv.innerHTML = window._previewOriginalHTML;
+  try { stampDocLatinNumFonts(pv); } catch (e) { console.warn('[latinNumFont]', e); }
   if (currentDoc === 'appendix') {
     pv.classList.add('appendix-mode');
     try { if (typeof normalizeNoColumnWidths === 'function') normalizeNoColumnWidths(pv); } catch (e) {}
@@ -16247,6 +16297,63 @@ function _setTableSpacingModeOff(pv) {
   if (pv) pv.querySelectorAll('.tbl-spacing-selected').forEach(t => t.classList.remove('tbl-spacing-selected'));
 }
 
+/** CSS ຕົວເລກ/ອັງກິດ Times New Roman — preview + print + PDF + Word */
+function getApbLatinNumCss() {
+  return `
+    .apb-explain-en,
+    .c-num, .c-pct, .c-date, .c-fit, .fee-amt-num,
+    .apb-cs-latin, .cs-latin, .cs-value, .cs-score,
+    .apb-tbl-unit, .pdf-foot-meta, .apb-pdf-footer-page,
+    .apb-data-tbl td[style*="text-align:right"],
+    .apb-data-tbl th[style*="text-align:right"],
+    .apb-data-tbl td[style*="text-align: right"],
+    .apb-data-tbl th[style*="text-align: right"],
+    table td[style*="text-align:right"],
+    table th[style*="text-align:right"],
+    .apb-appendix-tbl td[style*="text-align:right"],
+    .apb-appendix-tbl th[style*="text-align:right"],
+    .apb-data-tbl.tight-num td[style*="text-align:center"],
+    .apb-data-tbl.tight-num th[style*="text-align:center"],
+    .apb-auto-fit-tbl .c-date,
+    .apb-usage-apx-tbl .c-pct {
+      font-family: 'Times New Roman', serif !important;
+      font-variant-numeric: tabular-nums;
+    }
+  `;
+}
+
+/** Stamp TNR on numeric cells + wrap digits in dash-list .val cells */
+function stampDocLatinNumFonts(root) {
+  if (!root) return;
+  const TNR = "'Times New Roman', serif";
+  const stamp = (el) => {
+    el.style.setProperty('font-family', TNR, 'important');
+    el.style.setProperty('font-variant-numeric', 'tabular-nums', 'important');
+  };
+  root.querySelectorAll([
+    '.c-num', '.c-pct', '.c-date', '.c-fit', '.fee-amt-num',
+    '.apb-explain-en', '.apb-cs-latin', '.cs-latin', '.cs-value', '.cs-score',
+    '.apb-tbl-unit', '.pdf-foot-meta', '.apb-pdf-footer-page',
+    'td[style*="text-align:right"]', 'th[style*="text-align:right"]',
+    'td[style*="text-align: right"]', 'th[style*="text-align: right"]'
+  ].join(',')).forEach(stamp);
+  root.querySelectorAll('td[style*="text-align:center"], th[style*="text-align:center"]').forEach(el => {
+    const t = (el.textContent || '').replace(/\s/g, '');
+    if (t && /^[\d.,%xX/-]+$/.test(t)) stamp(el);
+  });
+  const numPat = /(\d[\d,.\s]*(?:%\/ປີ|\/ປີ|%| ກີບ| ເດືອນ| ປີ| x| X)?|\b\d{1,3}(?:,\d{3})+(?:\.\d+)?\b|\b\d+\.\d+%?\b)/g;
+  root.querySelectorAll('.apb-info-tbl td.val, .apb-info-tbl-sec12 td.val').forEach(el => {
+    if (el.querySelector('span.apb-explain-en')) return;
+    const html = el.innerHTML;
+    const wrapped = html.replace(/>([^<]*)</g, (m, text) => {
+      if (!numPat.test(text)) { numPat.lastIndex = 0; return m; }
+      numPat.lastIndex = 0;
+      return '>' + text.replace(numPat, '<span class="apb-explain-en">$1</span>') + '<';
+    });
+    if (wrapped !== html) el.innerHTML = wrapped;
+  });
+}
+
 /** CSS ຕາຕະລາງຂໍ້ມູນ (CIB / ຫຼັກຊັບ / tight-num) — ໃຊ້ຮ່ວມ preview + print popup. */
 function getApbDataTableExportCss() {
   return `
@@ -16286,7 +16393,7 @@ function getApbDataTableExportCss() {
     }
     .apb-usage-apx-tbl .c-pct {
       white-space: nowrap; text-align: center;
-      font-family: 'Times New Roman', serif; font-variant-numeric: tabular-nums;
+      font-family: 'Times New Roman', serif !important; font-variant-numeric: tabular-nums;
       padding-left: 3px; padding-right: 3px; min-width: 9mm;
     }
     .apb-usage-apx-tbl .c-num { padding-left: 4px !important; padding-right: 4px !important; }
@@ -16309,7 +16416,7 @@ function getApbDataTableExportCss() {
     .apb-data-tbl.tight-num td[style*="text-align:right"],
     .apb-data-tbl.tight-num th[style*="text-align:right"] {
       white-space: nowrap !important; font-size: 7.2pt !important;
-      font-family: 'Times New Roman', serif; font-variant-numeric: tabular-nums;
+      font-family: 'Times New Roman', serif !important; font-variant-numeric: tabular-nums;
       overflow: hidden; box-sizing: border-box;
     }
     .apb-col-ltv-tbl th.c-num,
@@ -16317,6 +16424,7 @@ function getApbDataTableExportCss() {
       padding-left: 8px !important;
       padding-right: 10px !important;
     }
+    ${getApbLatinNumCss()}
   `;
 }
 
@@ -16701,6 +16809,7 @@ function getPaginatedExportCss() {
     .apb-data-tbl tr, .apb-info-tbl tr { break-inside: avoid; page-break-inside: avoid; }
     ${getApbDataTableExportCss()}
     ${getApbCondExportCss()}
+    ${getApbLatinNumCss()}
   `;
 }
 
@@ -16779,7 +16888,7 @@ async function printHtmlTemplate(content, title) {
     .apb-data-tbl th[style*="text-align:right"] {
       white-space: nowrap !important;
       font-variant-numeric: tabular-nums;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Times New Roman', serif !important;
     }
     .apb-data-tbl.tight-num th,
     .apb-data-tbl.tight-num td {
@@ -17540,7 +17649,7 @@ function downloadWord() {
     .apb-data-tbl th[style*="text-align:right"] {
       white-space: normal !important;
       font-variant-numeric: tabular-nums;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Times New Roman', serif !important;
     }
     .apb-data-tbl.tight-num th,
     .apb-data-tbl.tight-num td {
@@ -17556,7 +17665,7 @@ function downloadWord() {
     .apb-data-tbl.tight-num th[style*="text-align:center"] {
       white-space: nowrap !important;
       font-size: 7.2pt !important;
-      font-family: 'Times New Roman', serif;
+      font-family: 'Times New Roman', serif !important;
       font-variant-numeric: tabular-nums;
     }
     .apb-data-tbl.research-grid th,
@@ -17662,6 +17771,7 @@ function downloadWord() {
     .tr-total td { background: #fff; color: #000; font-weight: 700; }
     .tr-sub td { background: #fff; font-weight: 700; }
     ${getApbCondExportCss()}
+    ${getApbLatinNumCss()}
     ${researchWordGridCSS}
   `;
 
@@ -18241,79 +18351,96 @@ function _convertAmountByCurrency(v, fromCurr, toCurr) {
   if (!fromToLak || !toToLak) return n;
   return (n * fromToLak) / toToLak;
 }
-function convertWorkingTablesCurrency() {
+function convertWorkingTablesCurrency(scope) {
+  const scopeKey = (typeof scope === 'string' ? scope : scope?.scope) || 'all';
   const fromCurr = document.getElementById('cv_from_currency')?.value || 'ກີບ';
   const toCurr = document.getElementById('cv_to_currency')?.value || 'ກີບ';
   if (fromCurr === toCurr) { showToast('ℹ️ ສະກຸນຄືກັນ — ບໍ່ຈຳເປັນແປງ'); return; }
 
-  // 1) Usage plan table (Page 6) — convert mun-kha-long-thun (1) + wong-ngern (2), then recalc thun-som-thob (4)
-  document.querySelectorAll('#usage_body tr').forEach(tr => {
-    const ins = tr.querySelectorAll('input');
-    [1,2].forEach(idx => {
-      const el = ins[idx];
-      if (!el) return;
-      const nv = _convertAmountByCurrency(el.value, fromCurr, toCurr);
-      el.value = Math.round(nv);
-    });
-    // recalc equity column (ins[4]) ໃຫ້ກົງກັບສະກຸນໃໝ່
-    if (ins[1] && typeof calcUsageRow === 'function') calcUsageRow(ins[1]);
-  });
-  if (typeof calcUsageTotals === 'function') calcUsageTotals();
+  const all = scopeKey === 'all';
+  const plOnly = scopeKey === 'pl';
 
-  // 2) Balance sheet inputs (Page 7)
-  ['cash','dep','rec','inv','oth','land','bld','veh','fur','mac','fixo','st1','st2','lt1','lt2','cap','ret','prev','net'].forEach(k => {
-    ['y1','y2'].forEach(y => {
-      const el = document.getElementById(`bs_${k}_${y}`);
+  if (all || scopeKey === 'usage') {
+    // 1) Usage plan table (Page 6)
+    document.querySelectorAll('#usage_body tr').forEach(tr => {
+      const ins = tr.querySelectorAll('input');
+      [1,2].forEach(idx => {
+        const el = ins[idx];
+        if (!el) return;
+        const nv = _convertAmountByCurrency(el.value, fromCurr, toCurr);
+        el.value = Math.round(nv);
+      });
+      if (ins[1] && typeof calcUsageRow === 'function') calcUsageRow(ins[1]);
+    });
+    if (typeof calcUsageTotals === 'function') calcUsageTotals();
+  }
+
+  if (all || scopeKey === 'bs') {
+    // 2) Balance sheet inputs (Page 7)
+    ['cash','dep','rec','inv','oth','land','bld','veh','fur','mac','fixo','st1','st2','lt1','lt2','cap','ret','prev','net'].forEach(k => {
+      ['y1','y2'].forEach(y => {
+        const el = document.getElementById(`bs_${k}_${y}`);
+        if (!el || el.readOnly) return;
+        const nv = _convertAmountByCurrency(el.value, fromCurr, toCurr);
+        el.value = Math.round(nv);
+      });
+    });
+    if (typeof calcBS === 'function') calcBS();
+  }
+
+  if (all || plOnly) {
+    // 3) P&L rows (Page 8) — convert underlying arrays
+    [plIncome, plExpense, plAdmin].forEach(arr => {
+      (arr || []).forEach(r => {
+        if (!r || !r.vals) return;
+        Object.keys(r.vals).forEach(y => {
+          const nv = _convertAmountByCurrency(r.vals[y], fromCurr, toCurr);
+          r.vals[y] = Math.round(nv);
+        });
+      });
+    });
+    if (typeof rebuildPL === 'function') rebuildPL();
+  }
+
+  if (all) {
+    // 4) Sync main requested/approved amounts
+    ['f_amount','ap_amount','col_value','col_total'].forEach(id => {
+      const el = document.getElementById(id);
       if (!el || el.readOnly) return;
       const nv = _convertAmountByCurrency(el.value, fromCurr, toCurr);
       el.value = Math.round(nv);
     });
-  });
-  if (typeof calcBS === 'function') calcBS();
+    if (typeof updateAmountText === 'function') {
+      updateAmountText('f_amount','f_amount_text');
+      updateAmountText('ap_amount','ap_amount_text');
+    }
+    if (typeof calcApprFees === 'function') calcApprFees();
 
-  // 3) P&L rows (Page 8) — convert underlying arrays
-  [plIncome, plExpense, plAdmin].forEach(arr => {
-    (arr || []).forEach(r => {
-      if (!r || !r.vals) return;
-      Object.keys(r.vals).forEach(y => {
-        const nv = _convertAmountByCurrency(r.vals[y], fromCurr, toCurr);
-        r.vals[y] = Math.round(nv);
-      });
-    });
-  });
-  if (typeof rebuildPL === 'function') rebuildPL();
-
-  // 4) Sync main requested/approved amounts
-  ['f_amount','ap_amount','col_value','col_total'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el || el.readOnly) return;
-    const nv = _convertAmountByCurrency(el.value, fromCurr, toCurr);
-    el.value = Math.round(nv);
-  });
-  if (typeof updateAmountText === 'function') {
-    updateAmountText('f_amount','f_amount_text');
-    updateAmountText('ap_amount','ap_amount_text');
-  }
-  if (typeof calcApprFees === 'function') calcApprFees();
-  if (typeof buildDSCR === 'function') buildDSCR();
-
-  // Update form currency selectors to current display target
-  const fCur = document.getElementById('f_currency');
-  const apCur = document.getElementById('ap_currency');
-  if (fCur && (toCurr === 'ກີບ' || toCurr === 'ໂດລາ' || toCurr === 'ບາດ')) fCur.value = toCurr;
-  if (apCur && (toCurr === 'ກີບ' || toCurr === 'ໂດລາ' || toCurr === 'ບາດ')) apCur.value = toCurr;
-  // ── sync usage_currency selector ດ້ວຍ (ສຳຄັນສຳລັບ Output) ──
-  const uCur = document.getElementById('usage_currency');
-  if (uCur && (toCurr === 'ກີບ' || toCurr === 'ໂດລາ' || toCurr === 'ບາດ')) {
-    uCur.value = toCurr; uCur.dataset.manual = '1';
+    // Update form currency selectors to current display target
+    const fCur = document.getElementById('f_currency');
+    const apCur = document.getElementById('ap_currency');
+    if (fCur && (toCurr === 'ກີບ' || toCurr === 'ໂດລາ' || toCurr === 'ບາດ')) fCur.value = toCurr;
+    if (apCur && (toCurr === 'ກີບ' || toCurr === 'ໂດລາ' || toCurr === 'ບາດ')) apCur.value = toCurr;
+    const uCur = document.getElementById('usage_currency');
+    if (uCur && (toCurr === 'ກີບ' || toCurr === 'ໂດລາ' || toCurr === 'ບາດ')) {
+      uCur.value = toCurr; uCur.dataset.manual = '1';
+    }
   }
 
-  // Prepare next conversion baseline
+  if (all || plOnly) {
+    if (typeof buildDSCR === 'function') buildDSCR();
+  }
+
   const fromSel = document.getElementById('cv_from_currency');
   if (fromSel) fromSel.value = toCurr;
+  if (plOnly) {
+    const plFrom = document.getElementById('pl_quick_from_currency');
+    if (plFrom) { plFrom.value = toCurr; plFrom.dataset.manual = '1'; }
+  }
   if (typeof syncQuickConvertPanels === 'function') syncQuickConvertPanels();
 
-  showToast(`✅ ແປງຕົວເລກຈາກ ${fromCurr} → ${toCurr} ສຳເລັດ`);
+  const scopeLabel = plOnly ? 'P&L' : (scopeKey === 'bs' ? 'ຖານະການເງິນ' : (scopeKey === 'usage' ? 'ແຜນນຳໃຊ້' : 'ຕາຕະລາງ'));
+  showToast(`✅ ແປງ${scopeLabel} ຈາກ ${fromCurr} → ${toCurr} ສຳເລັດ`);
 }
 function syncQuickConvertPanels() {
   const toCurr = document.getElementById('cv_to_currency')?.value || document.getElementById('cv_from_currency')?.value || getPrimaryLoanCurrency();
@@ -18328,6 +18455,10 @@ function syncQuickConvertPanels() {
 }
 function quickConvertCurrencyFromPanel(prefix) {
   const toCurr = document.getElementById(`${prefix}_quick_to_currency`)?.value || 'ກີບ';
+  const fromQuick = document.getElementById(`${prefix}_quick_from_currency`);
+  const fromCurr = fromQuick?.value
+    || document.getElementById('f_currency')?.value
+    || getPrimaryLoanCurrency();
   const thb = parseFloat(document.getElementById(`${prefix}_quick_thb_rate`)?.value) || 646;
   const usd = parseFloat(document.getElementById(`${prefix}_quick_usd_rate`)?.value) || 21688;
   const thbEl = document.getElementById('cv_thb_rate');
@@ -18336,10 +18467,9 @@ function quickConvertCurrencyFromPanel(prefix) {
   const toEl = document.getElementById('cv_to_currency');
   if (thbEl) thbEl.value = thb;
   if (usdEl) usdEl.value = usd;
+  if (fromEl) fromEl.value = fromCurr;
   if (toEl) toEl.value = toCurr;
-  if (fromEl && !fromEl.value) fromEl.value = getPrimaryLoanCurrency();
-  convertWorkingTablesCurrency();
-  // ── sync sheet's own currency selector (ສຳຄັນ: ໃຫ້ Output ສະແດງສະກຸນຖືກຕ້ອງ) ──
+  convertWorkingTablesCurrency(prefix === 'pl' ? 'pl' : (prefix === 'bs' ? 'bs' : (prefix === 'usage' ? 'usage' : 'all')));
   if (prefix === 'usage') {
     const uc = document.getElementById('usage_currency');
     if (uc) { uc.value = toCurr; uc.dataset.manual = '1'; }
